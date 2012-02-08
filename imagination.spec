@@ -1,6 +1,6 @@
 Name:           imagination          
 Version:        3.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        A lightweight and simple GTK based DVD slide show creator
 
 Group:          Applications/Multimedia
@@ -89,6 +89,9 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 
 
 %changelog
+* Wed Feb 08 2012 Nicolas Chauvet <kwizart@gmail.com> - 3.0-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
+
 * Sun May  1 2011 Richard Shaw <hobbes1069@gmail.com> - 3.0-6
 - Fixed minor issues with spec file for packaging compliance.
 
