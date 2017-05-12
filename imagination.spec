@@ -1,6 +1,6 @@
 Name:           imagination          
 Version:        3.0
-Release:        13%{?dist}
+Release:        14%{?dist}
 Summary:        A lightweight and simple GTK based DVD slide show creator
 
 Group:          Applications/Multimedia
@@ -48,12 +48,11 @@ autoreconf -fiv
 /bin/bash ./autogen.sh
 LDFLAGS=`pkg-config --libs gmodule-2.0`; export LDFLAGS
 %configure
-make %{?_smp_mflags}
+make %{?_smp_mflags} V=1
 
 
 %install
-rm -rf $RPM_BUILD_ROOT
-make install DESTDIR=$RPM_BUILD_ROOT
+%make_install
 
 # Move documentation so it will go in the right directory
 rm -rf $(pwd)/_tmpdoc && mkdir $(pwd)/_tmpdoc
@@ -65,15 +64,6 @@ rm %{buildroot}%{_libdir}/%{name}/*.la
 %find_lang %{name}
 
 desktop-file-validate %{buildroot}/%{_datadir}/applications/imagination.desktop
-
-%files -f %{name}.lang
-%defattr(-,root,root,-)
-%doc AUTHORS COPYING README _tmpdoc/*
-%{_bindir}/imagination
-%{_datadir}/applications/*
-%{_datadir}/icons/*
-%{_datadir}/%{name}
-%{_libdir}/%{name}
 
 
 %post
@@ -89,7 +79,20 @@ fi
 gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 
 
+%files -f %{name}.lang
+%license COPYING
+%doc AUTHORS README _tmpdoc/*
+%{_bindir}/imagination
+%{_datadir}/applications/*
+%{_datadir}/icons/hicolor/*/apps/%{name}.png
+%{_datadir}/icons/hicolor/scalable/apps/%{name}.svg
+%{_datadir}/%{name}
+%{_libdir}/%{name}
+
 %changelog
+* Thu Apr 13 2017 Richard Shaw <hobbes1069@gmail.com> - 3.0-14
+- Fix icon directory ownership.
+
 * Thu Mar 23 2017 Leigh Scott <leigh123linux@googlemail.com> - 3.0-13
 - Run autoreconf
 
