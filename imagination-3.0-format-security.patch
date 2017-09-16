@@ -1,0 +1,13 @@
+diff --git a/src/support.c b/src/support.c
+index b6cef85..2a6ccb3 100644
+--- a/src/support.c
++++ b/src/support.c
+@@ -1150,7 +1150,7 @@ img_message (img_window_struct *img,
+         gtk_text_buffer_insert(img->message_buffer, &message_end,
+                                parsed_message, -1);
+ 
+-        printf (parsed_message);
++        printf ("%s", parsed_message);
+ 
+         free(parsed_message);
+ 
