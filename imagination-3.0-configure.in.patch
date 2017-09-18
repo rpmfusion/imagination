@@ -1,11 +1,13 @@
---- trunk/configure.in	2011/03/06 20:23:41	598
-+++ trunk/configure.in	2011/04/23 06:57:35	599
-@@ -19,6 +19,8 @@
+diff --git a/configure.in b/configure.in
+index 518edab..103fc63 100644
+--- a/configure.in
++++ b/configure.in
+@@ -19,7 +19,7 @@ AC_PROG_INSTALL
  AC_PROG_LN_S
  AC_PROG_INTLTOOL
  
+-AC_SEARCH_LIBS([sqrtf], [m], ,AC_MSG_ERROR([Unable to find math library]))
 +AC_SEARCH_LIBS([sqrtf], [m], [], [AC_MSG_ERROR([Unable to find math library])])
-+
+ 
  # for plugins
  AC_DISABLE_STATIC
- AM_PROG_LIBTOOL

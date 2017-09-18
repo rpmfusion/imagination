@@ -1,0 +1,4662 @@
+diff --git a/ChangeLog b/ChangeLog
+index 2691008..58212cc 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,5 +1,14 @@
+ Imagination changelog
+ 
++xx/xx/xx - trunk:
++			- Added two more text transitions and moved -r encoder option before the input filename thanks to Bruce Guenter. 
++			- Fixed bugs #82 and #83 thanks to Davide Capodaglio. 
++            		- Fixed compilation error on Fedora 13 (check for libm)
++            		- Fix loading of slides without image, bug #3306969
++            		- Fix: Propose a project name (unknown.img) when saving a new project from the "save" button.
++            		- Rewrote the handling of video formats, including saving/loading the project settings. Fixes bug #3306974.
++            		- Added H.264/MPEG-4 AVC support, thanks to David Gnedt
++
+ 06/03/11 - 3.0:
+ 			- Added Chinese simplified and Chinese traditional translations.
+ 			- Icons in the transition menu are animated.
+diff --git a/configure.in b/configure.in
+index 0be7802..518edab 100644
+--- a/configure.in
++++ b/configure.in
+@@ -19,6 +19,8 @@ AC_PROG_INSTALL
+ AC_PROG_LN_S
+ AC_PROG_INTLTOOL
+ 
++AC_SEARCH_LIBS([sqrtf], [m], ,AC_MSG_ERROR([Unable to find math library]))
++
+ # for plugins
+ AC_DISABLE_STATIC
+ AM_PROG_LIBTOOL
+diff --git a/po/LINGUAS b/po/LINGUAS
+index ebec68f..41e2e96 100644
+--- a/po/LINGUAS
++++ b/po/LINGUAS
+@@ -1,2 +1,5 @@
+ # set of available languages (in alphabetic order)
+-cs de fr en_GB it pt_BR sv zh_CN zh_TW
++# List for release
++# cs de fr en_GB es it pt_BR sv zh_CN zh_TW
++# list for trunk
++ca cs de fr en_GB es it pt_BR sv zh_CN zh_TW ja ku ru sl_SI
+diff --git a/po/Makevars b/po/Makevars
+new file mode 100644
+index 0000000..64e7aee
+--- /dev/null
++++ b/po/Makevars
+@@ -0,0 +1 @@
++XGETTEXT_KEYWORDS = -k_ -kN_ -kU_ -kgettext_noop
+diff --git a/po/ca.po b/po/ca.po
+index dc094f0..fbacc8b 100644
+--- a/po/ca.po
++++ b/po/ca.po
+@@ -590,13 +590,15 @@ msgid "<b>Slideshow Settings</b>"
+ msgstr "<b>Arranjament de la presentació</b>"
+ 
+ #: ../src/new_slideshow.c:130
++#, fuzzy
+ msgid "<b>Video Format</b>"
+ msgstr "<b>Format del vídeo</b>"
+ 
+ #: ../src/new_slideshow.c:152 ../src/export.c:1337 ../src/export.c:1524
+ #: ../src/export.c:1705
++#, fuzzy
+ msgid "<b>Video Size</b>"
+-msgstr "<b>Mida del vídeo</b>"
++msgstr "<b>Qualitat del vídeo:</b>"
+ 
+ #: ../src/new_slideshow.c:166
+ msgid "<b>Advanced Settings</b>"
+@@ -773,6 +775,10 @@ msgid "Medium"
+ msgstr "Mitjana"
+ 
+ #, fuzzy
++#~ msgid "Video Size:"
++#~ msgstr "<b>Mida del vídeo</b>"
++
++#, fuzzy
+ #~ msgid "VOB (DVD Video)"
+ #~ msgstr "VOB (DVD de vídeo)"
+ 
+diff --git a/po/cs.po b/po/cs.po
+index 6635386..bff8171 100644
+--- a/po/cs.po
++++ b/po/cs.po
+@@ -4,7 +4,7 @@ msgstr ""
+ "Report-Msgid-Bugs-To: \n"
+ "POT-Creation-Date: 2011-02-18 20:10+0100\n"
+ "PO-Revision-Date: \n"
+-"Last-Translator: Michal Várady <miko.vaji@gmail.com>\n"
++"Last-Translator: Robert Chéramy <robert@cheramy.net>\n"
+ "Language-Team: \n"
+ "Language: \n"
+ "MIME-Version: 1.0\n"
+@@ -547,8 +547,9 @@ msgid "Save an Imagination slideshow project"
+ msgstr "Uložení projektu prezentace aplikace Imagination"
+ 
+ #: ../src/callbacks.c:1443
++#, fuzzy
+ msgid "Imagination projects"
+-msgstr "Projekty aplikace Imagination"
++msgstr "Projekty aplikace Imagination (*.img)"
+ 
+ #: ../src/callbacks.c:2195
+ msgid "Create empty slide"
+@@ -584,13 +585,15 @@ msgid "<b>Slideshow Settings</b>"
+ msgstr "<b>Nastavení prezentace</b>"
+ 
+ #: ../src/new_slideshow.c:130
++#, fuzzy
+ msgid "<b>Video Format</b>"
+-msgstr "<b>Formát videa</b>"
++msgstr "Formát videa:"
+ 
+ #: ../src/new_slideshow.c:152 ../src/export.c:1337 ../src/export.c:1524
+ #: ../src/export.c:1705
++#, fuzzy
+ msgid "<b>Video Size</b>"
+-msgstr "<b>Velikost videa</b>"
++msgstr "<b>Kvalita videa:</b>"
+ 
+ #: ../src/new_slideshow.c:166
+ msgid "<b>Advanced Settings</b>"
+@@ -753,8 +756,9 @@ msgid "Widescreen 16:9"
+ msgstr "Širokoúhlý 16:9"
+ 
+ #: ../src/export.c:1315 ../src/export.c:1502
++#, fuzzy
+ msgid "<b>Aspect Ratio</b>"
+-msgstr "<b>Poměr stran</b>"
++msgstr "Poměr stran:"
+ 
+ #: ../src/export.c:1373 ../src/export.c:1557
+ msgid "<b>Video Quality:</b>"
+@@ -768,18 +772,25 @@ msgstr "Nízká"
+ msgid "Medium"
+ msgstr "Střední"
+ 
+-#, fuzzy
++#~ msgid "Video Size:"
++#~ msgstr "Velikost videa:"
++
++#~ msgid "Frames per Second (FPS):"
++#~ msgstr "Snímek za sekundu:"
++
+ #~ msgid "VOB (DVD Video)"
+ #~ msgstr "VOB (DVD video)"
+ 
+-#, fuzzy
+ #~ msgid "OGV (Theora Vorbis)"
+ #~ msgstr "OGV (Theora/Vorbis)"
+ 
+-#, fuzzy
+ #~ msgid "FLV (Flash Video)"
+ #~ msgstr "FLV (Flash video)"
+ 
++#, fuzzy
++#~ msgid "low"
++#~ msgstr "Pomalý"
++
+ #~ msgid "Rotate the slide clockwise"
+ #~ msgstr "Otočit snímek ve směru hodinových ručiček"
+ 
+diff --git a/po/de.po b/po/de.po
+index 56cb170..7cbfea0 100644
+--- a/po/de.po
++++ b/po/de.po
+@@ -17,12 +17,12 @@ msgstr ""
+ "Project-Id-Version: imagination 1.0\n"
+ "Report-Msgid-Bugs-To: \n"
+ "POT-Creation-Date: 2011-02-18 20:10+0100\n"
+-"PO-Revision-Date: 2011-02-13 23:27+0100\n"
++"PO-Revision-Date: 2011-06-11 20:43+0100\n"
+ "Last-Translator: Robert Chéramy <robert@cheramy.net>\n"
+ "Language-Team: German\n"
+ "Language: \n"
+ "MIME-Version: 1.0\n"
+-"Content-Type: text/plain; charset=utf-8\n"
++"Content-Type: text/plain; charset=UTF-8\n"
+ "Content-Transfer-Encoding: 8bit\n"
+ "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+ "X-Poedit-Country: GERMANY\n"
+@@ -560,8 +560,9 @@ msgid "Save an Imagination slideshow project"
+ msgstr "Eine Imagination Diaschau speichern"
+ 
+ #: ../src/callbacks.c:1443
++#, fuzzy
+ msgid "Imagination projects"
+-msgstr "Imagination Diaschauen"
++msgstr "Imagination Diaschauen (*.img)"
+ 
+ #: ../src/callbacks.c:2195
+ msgid "Create empty slide"
+@@ -597,13 +598,15 @@ msgid "<b>Slideshow Settings</b>"
+ msgstr "<b>Diaschau-Einstellungen</b>"
+ 
+ #: ../src/new_slideshow.c:130
++#, fuzzy
+ msgid "<b>Video Format</b>"
+-msgstr "<b>Videoformat</b>"
++msgstr "Videoformat:"
+ 
+ #: ../src/new_slideshow.c:152 ../src/export.c:1337 ../src/export.c:1524
+ #: ../src/export.c:1705
++#, fuzzy
+ msgid "<b>Video Size</b>"
+-msgstr "<b>Videogröße</b>"
++msgstr "<b>Videoqualität</b>"
+ 
+ #: ../src/new_slideshow.c:166
+ msgid "<b>Advanced Settings</b>"
+@@ -666,6 +669,7 @@ msgstr "Projektnamen für die Diaschau wählen"
+ #. * function will take some preventive measures and also switches mode into
+ #. * preview if needed.
+ #: ../src/support.c:337 ../src/export.c:1183
++#, fuzzy
+ msgid "VOB (DVD video)"
+ msgstr "VOB (DVD video)"
+ 
+@@ -676,12 +680,14 @@ msgstr "MP4 (MPEG-4)"
+ #. This function call should be the first thing exporter does, since this
+ #. * function will take some preventive measures.
+ #: ../src/support.c:349 ../src/export.c:1299
++#, fuzzy
+ msgid "OGV (Theora/Vorbis)"
+ msgstr "OGV (Theora/Vorbis)"
+ 
+ #. This function call should be the first thing exporter does, since this
+ #. * function will take some preventive measures.
+ #: ../src/support.c:355 ../src/export.c:1486
++#, fuzzy
+ msgid "FLV (Flash video)"
+ msgstr "FLV (Flash video)"
+ 
+@@ -762,8 +768,9 @@ msgid "Widescreen 16:9"
+ msgstr "Breitbild 16:9"
+ 
+ #: ../src/export.c:1315 ../src/export.c:1502
++#, fuzzy
+ msgid "<b>Aspect Ratio</b>"
+-msgstr "<b>Aspektverhältnis</b>"
++msgstr "Aspektverhältnis:"
+ 
+ #: ../src/export.c:1373 ../src/export.c:1557
+ msgid "<b>Video Quality:</b>"
+@@ -777,6 +784,37 @@ msgstr "Niedrig"
+ msgid "Medium"
+ msgstr "Mittel"
+ 
++#~ msgid "Video Size:"
++#~ msgstr "Videogröße:"
++
++#~ msgid "Frames per Second (FPS):"
++#~ msgstr "Frame pro Sekunde (FPS):"
++
++#~ msgid "Bitrate:"
++#~ msgstr "Datenrate:"
++
++#~ msgid "512 kbps (low)"
++#~ msgstr "512 kbps (niedrig)"
++
++#~ msgid "1024 kbps (medium)"
++#~ msgstr "1024 kbps (mittel)"
++
++#~ msgid "2048 kbps (high)"
++#~ msgstr "2048 kbps (hoch)"
++
++#~ msgid "384 kbps (low)"
++#~ msgstr "384 kbps (niedrig)"
++
++#~ msgid "768 kbps (medium)"
++#~ msgstr "768 kbps (mittel)"
++
++#~ msgid "1536 kbps (high)"
++#~ msgstr "1536 kbps (hoch)"
++
++#, fuzzy
++#~ msgid "low"
++#~ msgstr "Langsam"
++
+ #~ msgid "Rotate the slide clockwise"
+ #~ msgstr "Das Dia im Uhrzeigersinn drehen"
+ 
+diff --git a/po/en_GB.po b/po/en_GB.po
+index cbffbca..6ba4c6a 100644
+--- a/po/en_GB.po
++++ b/po/en_GB.po
+@@ -8,8 +8,8 @@ msgstr ""
+ "Project-Id-Version: imagination 1.0\n"
+ "Report-Msgid-Bugs-To: \n"
+ "POT-Creation-Date: 2011-02-18 20:10+0100\n"
+-"PO-Revision-Date: 2011-03-06 09:46+0100\n"
+-"Last-Translator: \n"
++"PO-Revision-Date: 2011-06-11 20:44+0100\n"
++"Last-Translator: Robert Chéramy <robert@cheramy.net>\n"
+ "Language-Team: English (British)\n"
+ "Language: \n"
+ "MIME-Version: 1.0\n"
+@@ -542,8 +542,9 @@ msgid "Save an Imagination slideshow project"
+ msgstr "Save an Imagination slideshow project"
+ 
+ #: ../src/callbacks.c:1443
++#, fuzzy
+ msgid "Imagination projects"
+-msgstr "Imagination projects"
++msgstr "Imagination projects (*.img)"
+ 
+ #: ../src/callbacks.c:2195
+ msgid "Create empty slide"
+@@ -579,13 +580,15 @@ msgid "<b>Slideshow Settings</b>"
+ msgstr "<b>Slideshow Settings</b>"
+ 
+ #: ../src/new_slideshow.c:130
++#, fuzzy
+ msgid "<b>Video Format</b>"
+-msgstr "<b>Video Format</b>"
++msgstr "Video Format:"
+ 
+ #: ../src/new_slideshow.c:152 ../src/export.c:1337 ../src/export.c:1524
+ #: ../src/export.c:1705
++#, fuzzy
+ msgid "<b>Video Size</b>"
+-msgstr "<b>Video Size:</b>"
++msgstr "<b>Video Quality:</b>"
+ 
+ #: ../src/new_slideshow.c:166
+ msgid "<b>Advanced Settings</b>"
+@@ -646,6 +649,7 @@ msgstr "Please choose the slideshow project filename"
+ #. * function will take some preventive measures and also switches mode into
+ #. * preview if needed.
+ #: ../src/support.c:337 ../src/export.c:1183
++#, fuzzy
+ msgid "VOB (DVD video)"
+ msgstr "VOB (DVD video)"
+ 
+@@ -656,12 +660,14 @@ msgstr "MP4 (MPEG-4)"
+ #. This function call should be the first thing exporter does, since this
+ #. * function will take some preventive measures.
+ #: ../src/support.c:349 ../src/export.c:1299
++#, fuzzy
+ msgid "OGV (Theora/Vorbis)"
+ msgstr "OGV (Theora/Vorbis)"
+ 
+ #. This function call should be the first thing exporter does, since this
+ #. * function will take some preventive measures.
+ #: ../src/support.c:355 ../src/export.c:1486
++#, fuzzy
+ msgid "FLV (Flash video)"
+ msgstr "FLV (Flash video)"
+ 
+@@ -742,8 +748,9 @@ msgid "Widescreen 16:9"
+ msgstr "Widescreen 16:9"
+ 
+ #: ../src/export.c:1315 ../src/export.c:1502
++#, fuzzy
+ msgid "<b>Aspect Ratio</b>"
+-msgstr "<b>Aspect Ratio</b>"
++msgstr "Aspect Ratio:"
+ 
+ #: ../src/export.c:1373 ../src/export.c:1557
+ msgid "<b>Video Quality:</b>"
+@@ -757,6 +764,37 @@ msgstr "Low"
+ msgid "Medium"
+ msgstr "Medium"
+ 
++#~ msgid "Video Size:"
++#~ msgstr "Video Size:"
++
++#~ msgid "Frames per Second (FPS):"
++#~ msgstr "Frames per Second (FPS):"
++
++#~ msgid "Bitrate:"
++#~ msgstr "Bitrate:"
++
++#~ msgid "512 kbps (low)"
++#~ msgstr "512 kbps (low)"
++
++#~ msgid "1024 kbps (medium)"
++#~ msgstr "1024 kbps (medium)"
++
++#~ msgid "2048 kbps (high)"
++#~ msgstr "2048 kbps (high)"
++
++#~ msgid "384 kbps (low)"
++#~ msgstr "384 kbps (low)"
++
++#~ msgid "768 kbps (medium)"
++#~ msgstr "768 kbps (medium)"
++
++#~ msgid "1536 kbps (high)"
++#~ msgstr "1536 kbps (high)"
++
++#, fuzzy
++#~ msgid "low"
++#~ msgstr "Slow"
++
+ #~ msgid "Rotate the slide clockwise"
+ #~ msgstr "Rotate the slide clockwise"
+ 
+diff --git a/po/es.po b/po/es.po
+index d61bd0b..98a8a06 100644
+--- a/po/es.po
++++ b/po/es.po
+@@ -1,31 +1,29 @@
+-# Spanish translations for imagination package.
++# English translations for imagination package.
+ # Copyright (C) 2009 THE imagination'S COPYRIGHT HOLDER
+ # This file is distributed under the same license as the imagination package.
+-# xroberx <xroberx@gmail.com>, 2009.
++# colossus73 <colossus73@gmail.com>, 2009.
+ #
+ msgid ""
+ msgstr ""
+ "Project-Id-Version: imagination 1.0\n"
+ "Report-Msgid-Bugs-To: \n"
+ "POT-Creation-Date: 2011-02-18 20:10+0100\n"
+-"PO-Revision-Date: 2009-10-09 16:09-0500\n"
+-"Last-Translator: Dairon Medina Caro <dairon@ceac.cu>\n"
+-"Language-Team: Spanish <dairon@ceac.cu>\n"
+-"Language: es\n"
++"PO-Revision-Date: 2011-06-11 20:46+0100\n"
++"Last-Translator: Robert Chéramy <robert@cheramy.net>\n"
++"Language-Team: Spanish\n"
++"Language: Spanish\n"
+ "MIME-Version: 1.0\n"
+ "Content-Type: text/plain; charset=UTF-8\n"
+ "Content-Transfer-Encoding: 8bit\n"
+ "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+-"X-Poedit-Language: Spanish\n"
+-"X-Poedit-Country: SPAIN\n"
+ 
+ #: ../imagination.desktop.in.h:1
+ msgid "A DVD slideshow maker"
+-msgstr "Un creador de presentaciones de diapositivas DVD"
++msgstr "Creador de DVD slideshow"
+ 
+ #: ../imagination.desktop.in.h:2
+ msgid "A lightweight DVD slideshow maker using GTK+2"
+-msgstr "Un ligero creador de presentaciones de diapositivas DVD en GTK+2"
++msgstr "Creador de DVD slideshow usando GTK+2"
+ 
+ #: ../imagination.desktop.in.h:3
+ msgid "Imagination"
+@@ -38,11 +36,11 @@ msgstr "Reproduciendo %s..."
+ 
+ #: ../src/audio.c:137 ../src/main-window.c:1130
+ msgid "Play the selected file"
+-msgstr "Reproducir el archivo seleccionado"
++msgstr "Reproducir archivo seleccionado"
+ 
+ #: ../src/audio.c:145
+ msgid "Stop the playback"
+-msgstr "Detener la reproducción"
++msgstr "Parar reproducción"
+ 
+ #: ../src/audio.c:272
+ #, c-format
+@@ -51,7 +49,7 @@ msgid ""
+ "incompatible sample rate\n"
+ msgstr ""
+ "%s:\n"
+-"frecuencia de muestreo incompatible\n"
++"incompatible 'sample rate'\n"
+ 
+ #: ../src/audio.c:277
+ #, c-format
+@@ -60,7 +58,7 @@ msgid ""
+ "incompatible number of channels\n"
+ msgstr ""
+ "%s:\n"
+-"número de canales incompatible\n"
++"incompatible número de canales\n"
+ 
+ #: ../src/audio.c:283
+ #, c-format
+@@ -69,7 +67,7 @@ msgid ""
+ "incompatible sample rate and number of channels\n"
+ msgstr ""
+ "%s:\n"
+-"frecuencia de muestreo y número de canales incompatible\n"
++"incompatible 'sample rate' y número de canales\n"
+ 
+ #: ../src/audio.c:303
+ #, c-format
+@@ -78,23 +76,23 @@ msgid ""
+ "<b>Do you want to continue without these files?</b>"
+ msgstr ""
+ "%s\n"
+-"<b>Desea continuar sin estos archivos?</b>"
++"<b>¿quiere seguir sin estos archivos?</b>"
+ 
+ #: ../src/audio.c:307 ../src/audio.c:454
+ msgid "Audio files mismatch:"
+-msgstr "Falta de coincidencia de archivos de audio:"
++msgstr "Desajuste de archivos de audio:"
+ 
+ #: ../src/audio.c:401
+ msgid "Incompatible sample rate."
+-msgstr "Frecuencia de muestreo incompatible."
++msgstr "Incompatible sample rate."
+ 
+ #: ../src/audio.c:408
+ msgid "Incompatible number of channels."
+-msgstr "Número de canales incompatible."
++msgstr "Incompatible number of channels."
+ 
+ #: ../src/audio.c:415
+ msgid "Incompatible sample rate and number of channels."
+-msgstr "Frecuencia de muestreo y número de canales incompatibles."
++msgstr "Incompatible sample rate and number of channels."
+ 
+ #: ../src/audio.c:437
+ #, c-format
+@@ -104,36 +102,34 @@ msgid_plural ""
+ "File selection contains %d audio files that are incompatible with other "
+ "files."
+ msgstr[0] ""
+-"Selección de archivos contiene %d archivo de audio que es incompatible con "
+-"otros archivos."
++"File selection contains %d audio file that is incompatible with other files."
+ msgstr[1] ""
+-"Selección de archivos contiene %d archivos de audio que son incompatibles "
+-"con otros archivos."
++"File selection contains %d audio files that are incompatible with other "
++"files."
+ 
+ #: ../src/audio.c:443
+ msgid "Please check audio tab for more information."
+-msgstr "Por favor, elija los archivos de audio a importar"
++msgstr "Please check audio tab for more information."
+ 
+ #: ../src/main-window.c:222
+ msgid "_Slideshow"
+ msgstr "_Presentación"
+ 
+ #: ../src/main-window.c:236
+-#, fuzzy
+ msgid "Import slideshow"
+-msgstr "Exportando la presentación de diapositivas"
++msgstr "Importar presentación"
+ 
+ #: ../src/main-window.c:260
+ msgid "Import p_ictures"
+-msgstr "Importar _imágenes"
++msgstr "Importar imágenes"
+ 
+ #: ../src/main-window.c:270
+ msgid "Import _music"
+-msgstr "Importar _música"
++msgstr "Importar audio"
+ 
+ #: ../src/main-window.c:287
+ msgid "_Preview"
+-msgstr "P_revisualizar"
++msgstr "_Previo"
+ 
+ #: ../src/main-window.c:295
+ msgid "Export"
+@@ -147,7 +143,7 @@ msgstr "_Diapositiva"
+ #. Preview quality menu
+ #: ../src/main-window.c:332
+ msgid "Preview quality"
+-msgstr "Calidad de la previsualización"
++msgstr "Previo calidad"
+ 
+ #: ../src/main-window.c:338
+ msgid "_Low"
+@@ -164,7 +160,7 @@ msgstr "_Zoom"
+ 
+ #: ../src/main-window.c:373
+ msgid "Add empt_y slide"
+-msgstr "Agregar una diapositiva _vacía"
++msgstr "Añadir presentación vacía"
+ 
+ #: ../src/main-window.c:382
+ msgid "Dele_te"
+@@ -172,19 +168,19 @@ msgstr "_Eliminar"
+ 
+ #: ../src/main-window.c:390
+ msgid "Repor_t"
+-msgstr "Repor_te"
++msgstr "Informe"
+ 
+ #: ../src/main-window.c:402
+ msgid "Rotate co_unter-clockwise"
+-msgstr "Rotar en el sentido _antihorario"
++msgstr "Rotar sentido inverso reloj"
+ 
+ #: ../src/main-window.c:413
+ msgid "_Rotate clockwise"
+-msgstr "_Rotar en el sentido horario"
++msgstr "_Rotar sentido horario reloj"
+ 
+ #: ../src/main-window.c:428
+ msgid "Un_select all"
+-msgstr "_Deseleccionar todo"
++msgstr "_Deshacer"
+ 
+ #. View menu
+ #: ../src/main-window.c:434
+@@ -193,23 +189,22 @@ msgstr "_Ver"
+ 
+ #: ../src/main-window.c:440
+ msgid "Preview mode"
+-msgstr "Previsualizar"
++msgstr "Modo Vista Previa"
+ 
+ #: ../src/main-window.c:446
+ msgid "Overview mode"
+-msgstr "Modo de vista general"
++msgstr "Modo descriptivo"
+ 
+ #: ../src/main-window.c:452
+-#, fuzzy
+ msgid "Preview _frame rate"
+-msgstr "Previsualizar"
++msgstr "Preview _frame rate"
+ 
+ #: ../src/main-window.c:469
+ #, c-format
+ msgid "%d frame per second"
+ msgid_plural "%d frames per second"
+-msgstr[0] ""
+-msgstr[1] ""
++msgstr[0] "%d cuadro por segundo"
++msgstr[1] "%d cuadros por segundo"
+ 
+ #. Help menu
+ #: ../src/main-window.c:486
+@@ -222,15 +217,15 @@ msgstr "Contenidos"
+ 
+ #: ../src/main-window.c:512 ../src/new_slideshow.c:65
+ msgid "Create a new slideshow"
+-msgstr "Crear una nueva presentación de diapositivas"
++msgstr "Crear presentación nueva"
+ 
+ #: ../src/main-window.c:517
+ msgid "Open a slideshow"
+-msgstr "Abrir una presentación de diapositivas"
++msgstr "Abrir presentación"
+ 
+ #: ../src/main-window.c:522
+ msgid "Save the slideshow"
+-msgstr "Guardar la presentación de diapositivas"
++msgstr "Guardar presentación"
+ 
+ #: ../src/main-window.c:535
+ msgid "Import pictures"
+@@ -238,64 +233,59 @@ msgstr "Importar imágenes"
+ 
+ #: ../src/main-window.c:544
+ msgid "Import music"
+-msgstr "Importar música"
++msgstr "Importar audio"
+ 
+ #: ../src/main-window.c:549
+ msgid "Delete the selected slides"
+-msgstr "Eliminar las diapositivas seleccionadas"
++msgstr "Eliminar diapositivas seleccionadas"
+ 
+ #: ../src/main-window.c:559
+-#, fuzzy
+ msgid "Rotate the slide 90 degrees to the left"
+-msgstr "Rotar la dispositiva en sentido antihorario"
++msgstr "Rotar diapositiva 90 grados a la izquierda"
+ 
+ #: ../src/main-window.c:570
+ msgid "Rotate the slide 90 degrees to the right"
+-msgstr ""
++msgstr "Rotar diapositiva 90 grados a la derecha"
+ 
+ #: ../src/main-window.c:576
+ msgid "Zoom In"
+-msgstr "Acercar"
++msgstr "Zoom dentro"
+ 
+ #: ../src/main-window.c:581
+ msgid "Zoom Out"
+-msgstr "Alejar"
++msgstr "Zoom fuera"
+ 
+ #: ../src/main-window.c:586
+ msgid "Normal Size"
+-msgstr "Tamaño normal"
++msgstr "Tamaño Normal"
+ 
+ #: ../src/main-window.c:591
+ msgid "Fit Zoom in Window"
+-msgstr ""
++msgstr "Fijar Zoom en Ventana"
+ 
+ #: ../src/main-window.c:599 ../src/callbacks.c:1362
+ msgid "Starts the preview"
+-msgstr "Iniciar la previsualización"
++msgstr "Reproducir vista previa"
+ 
+ #: ../src/main-window.c:608
+-#, fuzzy
+ msgid "Go to the first slide of the slideshow"
+-msgstr "Nombre de la presentación de diapositivas:"
++msgstr "Ir a la primera diapositiva"
+ 
+ #: ../src/main-window.c:614
+-#, fuzzy
+ msgid "Go to the previous slide of the slideshow"
+ msgstr "Ir a la diapositiva anterior"
+ 
+ #: ../src/main-window.c:630 ../src/main-window.c:837
+ msgid " of "
+-msgstr " de"
++msgstr "de"
+ 
+ #: ../src/main-window.c:642
+-#, fuzzy
+ msgid "Go to the next slide of the slideshow"
+-msgstr "Ir a la diapositiva siguiente"
++msgstr "Ir a la siguiente diapositiva"
+ 
+ #: ../src/main-window.c:648
+-#, fuzzy
+ msgid "Go to the last slide of the slideshow"
+-msgstr "Nombre de la presentación de diapositivas:"
++msgstr "Ir a la última diapositiva"
+ 
+ #: ../src/main-window.c:699
+ msgid "Video"
+@@ -303,12 +293,12 @@ msgstr "Video"
+ 
+ #: ../src/main-window.c:717
+ msgid "<b>Slide Settings</b>"
+-msgstr "<b>Ajustes de las diapositivas</b>"
++msgstr "<b>Ajustes de diapositiva</b>"
+ 
+ #. Transition types label
+ #: ../src/main-window.c:727
+ msgid "Transition Type:"
+-msgstr "Tipo de transición:"
++msgstr "Tipo de Transición:"
+ 
+ #: ../src/main-window.c:747
+ msgid "Random"
+@@ -316,12 +306,14 @@ msgstr "Aleatorio"
+ 
+ #: ../src/main-window.c:748
+ msgid "Imagination randomly decides which transition to apply"
+-msgstr "Imagination elige al azar que transición aplicar"
++msgstr ""
++"Imagination decide aleatoriamente la tImagination decide aleatoriamente "
++"laImaginatio decide aleatoriamente la transición"
+ 
+ #. Transition duration
+ #: ../src/main-window.c:754
+ msgid "Transition Speed:"
+-msgstr "Velocidad de la transición:"
++msgstr "Velocidad de la Transición:"
+ 
+ #: ../src/main-window.c:765
+ msgid "Fast"
+@@ -338,20 +330,20 @@ msgstr "Lento"
+ #. Slide duration
+ #: ../src/main-window.c:776
+ msgid "Slide Duration in sec:"
+-msgstr "Duración de la diapositiva en segundos:"
++msgstr "Duración de diapositiva en sec:"
+ 
+ #. Slide Total Duration
+ #: ../src/main-window.c:787
+ msgid "Slideshow Length:"
+-msgstr "Duración de la presentación de diapositivas:"
++msgstr "Longitud de Presentación:"
+ 
+ #: ../src/main-window.c:804
+ msgid "<b>Slide Motion</b>"
+-msgstr "<b>Movimiento de las diapositivas</b>"
++msgstr "<b>Movimiento de diapositiva</b>"
+ 
+ #: ../src/main-window.c:814
+ msgid "Stop Point:"
+-msgstr "Detener punto:"
++msgstr "Punto de parada:"
+ 
+ #: ../src/main-window.c:851
+ msgid "Duration:"
+@@ -359,41 +351,39 @@ msgstr "Duración:"
+ 
+ #: ../src/main-window.c:860
+ msgid "Zoom: "
+-msgstr "Zoom:"
++msgstr "Zoom: "
+ 
+ #: ../src/main-window.c:874
+ msgid "Add"
+-msgstr "Añadir"
++msgstr "Añade"
+ 
+ #: ../src/main-window.c:878
+ msgid "Update"
+-msgstr "Actualizar"
++msgstr "Actualiza"
+ 
+ #: ../src/main-window.c:883
+ msgid "Remove"
+-msgstr "Eliminar"
++msgstr "Elimina"
+ 
+ #: ../src/main-window.c:897
+ msgid "<b>Slide Text</b>"
+-msgstr "<b>Texto de las diapositivas</b>"
++msgstr "<b>Texto en diapositiva</b>"
+ 
+ #: ../src/main-window.c:926 ../src/main-window.c:1562
+ msgid "Click to expand the area"
+-msgstr "Haga clic aquí para expandir el área"
++msgstr "Click para expandir area"
+ 
+ #: ../src/main-window.c:943
+ msgid "Click to choose the font"
+-msgstr "Haga clic aquí para seleccionar el tipo de letra"
++msgstr "Click para escoger  fuente"
+ 
+ #: ../src/main-window.c:950
+-#, fuzzy
+ msgid "Click to choose the font color"
+-msgstr "Haga clic aquí para seleccionar el tipo de letra"
++msgstr "Click para escoger color de fuente"
+ 
+ #: ../src/main-window.c:957
+-#, fuzzy
+ msgid "Click to choose the font background color"
+-msgstr "Haga clic aquí para seleccionar el tipo de letra"
++msgstr "Click para escoger color de fondo de fuente"
+ 
+ #: ../src/main-window.c:961
+ msgid "Animation:"
+@@ -401,23 +391,23 @@ msgstr "Animación:"
+ 
+ #: ../src/main-window.c:973
+ msgid "Animation Speed:"
+-msgstr "Velocidad de la animación:"
++msgstr "Velocidad de Animación:"
+ 
+ #: ../src/main-window.c:989
+ msgid "Placing is relative to:"
+-msgstr "Colocar en relación a:"
++msgstr "Situación es en relación a:"
+ 
+ #: ../src/main-window.c:1003
+ msgid "Exported video"
+-msgstr "Exportar video"
++msgstr "Video Exportado"
+ 
+ #: ../src/main-window.c:1005
+ msgid "Original image"
+-msgstr "Imagen original"
++msgstr "Original image"
+ 
+ #: ../src/main-window.c:1014
+ msgid "Subtitle position:"
+-msgstr "Posición del subtítulo:"
++msgstr "Posición de Subtítulo:"
+ 
+ #. Background music frame
+ #: ../src/main-window.c:1055
+@@ -430,60 +420,60 @@ msgstr "<b>Música de fondo</b>"
+ 
+ #: ../src/main-window.c:1114
+ msgid "Music Duration:"
+-msgstr "Duración de la música:"
++msgstr "Duración de Audio:"
+ 
+ #: ../src/main-window.c:1138
+ msgid "Delete the selected file"
+-msgstr "Borrar el archivo seleccionado"
++msgstr "Elimina archivo seleccionado"
+ 
+ #: ../src/main-window.c:1145
+ msgid "Move the selected file up"
+-msgstr "Subir el archivo seleccionado"
++msgstr "Mueve archivo seleccionado hacia arriba"
+ 
+ #: ../src/main-window.c:1152
+ msgid "Move the selected file down"
+-msgstr "Bajar el archivo seleccionado"
++msgstr "Mueve archivo selleccionado hacia abajo"
+ 
+ #: ../src/main-window.c:1159
+ msgid "Clear all files"
+-msgstr "Borrar todos los archivos"
++msgstr "Limpiar todos los archivos"
+ 
+ #. End of Background music frame
+ #. Begin of Message tab
+ #: ../src/main-window.c:1164
+ msgid "Messages"
+-msgstr ""
++msgstr "Informes"
+ 
+ #: ../src/main-window.c:1557
+ msgid "Click to shrink the area"
+-msgstr "Haga clic aquí para reducir el tamaño del área"
++msgstr "Click para encoger el área"
+ 
+ #: ../src/main-window.c:1589 ../src/callbacks.c:1120
+ msgid "Sorry, I could not perform the operation!"
+-msgstr "Lo siento, ¡No puedo realizar la operación!"
++msgstr "Lo siento, no puedo ejecutar la acción"
+ 
+ #: ../src/main-window.c:1738
+ #, c-format
+ msgid "File '%s' not found"
+-msgstr ""
++msgstr "Archivo '%s' no encontrado"
+ 
+ #: ../src/main-window.c:1747
+ msgid "Resolution"
+-msgstr "Resolución:"
++msgstr "Resolución"
+ 
+ #: ../src/main-window.c:1747
+ msgid "Type"
+-msgstr "Tipo:"
++msgstr "Tipo"
+ 
+ #. No animation function (id = 0)
+ #: ../src/main-window.c:2062 ../src/main-window.c:2064 ../src/support.c:179
+ #: ../src/subtitles.c:162
+ msgid "None"
+-msgstr "Ninguna"
++msgstr "Nada"
+ 
+ #: ../src/main-window.c:2605
+ msgid "Slides Transitions Report Dialog"
+-msgstr "Diálogo de Informe de Transición de Diapositivas"
++msgstr "Diálogo de Informe sobre la Transición"
+ 
+ #: ../src/main-window.c:2685
+ msgid ""
+@@ -496,27 +486,23 @@ msgstr ""
+ "\n"
+ "<span weight='bold'>Nota:</span>\n"
+ "\n"
+-"Las diapositivas cuya transición se aplica sólo una vez no se muestran "
++"Las diapositivas cuya transición es aplicada sólo una vez no son mostradas "
+ "aquí.\n"
+-"Haga clic en la diapositiva para que Imagination la seleccione "
+-"automáticamente."
++"Click sobre la diapositiva para  seleccionarla automáticamente."
+ 
+ #: ../src/callbacks.c:124 ../src/callbacks.c:469 ../src/callbacks.c:1421
+ #: ../src/callbacks.c:1499
+ msgid "You didn't save your slideshow yet. Are you sure you want to close it?"
+-msgstr ""
+-"Usted todavía no ha guardado su presentación de diapositivas. ¿Está seguro "
+-"que desea cerrarla?"
++msgstr "Usted no guardó su presenatción aún. ¿está seguro que quiere cerrarlo?"
+ 
+ #: ../src/callbacks.c:210
+-#, fuzzy, c-format
++#, c-format
+ msgid "Please wait, importing image %d out of %d"
+-msgstr "Por favor espere, importando diapositiva %d de %d"
++msgstr "Espere, por favor, importando imagen %d de %d"
+ 
+ #: ../src/callbacks.c:279
+-#, fuzzy
+ msgid "Import audio files, use CTRL key for multiple select"
+-msgstr "Importar diapositivas, use la tecla MAYÚS para una selección múltiple"
++msgstr "Importar archivos de audio, usa CTRL para seleccionar varios"
+ 
+ #: ../src/callbacks.c:291
+ msgid "All audio files"
+@@ -528,52 +514,48 @@ msgid "All files"
+ msgstr "Todos los archivos"
+ 
+ #: ../src/callbacks.c:356
+-#, fuzzy
+ msgid "Import images, use SHIFT key for multiple select"
+-msgstr "Importar diapositivas, use la tecla MAYÚS para una selección múltiple"
++msgstr "Import images, use SHIFT key for multiple select"
+ 
+ #: ../src/callbacks.c:369
+ msgid "All image files"
+-msgstr "Todas las imágenes"
++msgstr "Todos los archivos de imagen"
+ 
+ #: ../src/callbacks.c:529
+ #, c-format
+ msgid "%d x %d pixels"
+ msgid_plural "%d x %d pixels"
+-msgstr[0] "%d x %d píxeles"
++msgstr[0] "%d x %d pixels"
+ msgstr[1] "%d x %d pixels"
+ 
+ #: ../src/callbacks.c:805
+ msgid "translator-credits"
+-msgstr ""
+-"Giuseppe Torelli <colossus73@gmail.com>\n"
+-"Elega <elega@elega.com.ar>"
++msgstr "Giuseppe Torelli <colossus73@gmail.com>"
+ 
+ #: ../src/callbacks.c:1372
+ msgid "Stops the preview"
+-msgstr "Detener la previsualización"
++msgstr "Parar vista previa"
+ 
+ #: ../src/callbacks.c:1432
+ msgid "Load an Imagination slideshow project"
+-msgstr "Cargar un proyecto de presentación de diapositivas Imagination"
++msgstr "Cargar un proyecto de presentación"
+ 
+ #: ../src/callbacks.c:1433
+ msgid "Save an Imagination slideshow project"
+-msgstr "Guardar un proyecto de presentación de diapositivas Imagination"
++msgstr "Guardar proyecto de presentación"
+ 
+ #: ../src/callbacks.c:1443
+ #, fuzzy
+ msgid "Imagination projects"
+-msgstr "Imagination"
++msgstr "proyectos de Imagination (*.img)"
+ 
+ #: ../src/callbacks.c:2195
+-#, fuzzy
+ msgid "Create empty slide"
+-msgstr "Crear una nueva diapositiva"
++msgstr "Crear una diapositiva vacía"
+ 
+ #: ../src/callbacks.c:2206
+ msgid "Empty slide options:"
+-msgstr "Opciones de la diapositiva vacía:"
++msgstr "Opciones de diapositiva vacía:"
+ 
+ #: ../src/callbacks.c:2216
+ msgid "Use _solid color"
+@@ -581,155 +563,160 @@ msgstr "Usar color sólido"
+ 
+ #: ../src/callbacks.c:2222
+ msgid "Use _linear gradient"
+-msgstr "Usar gradiante _lineal"
++msgstr "Usar degradado linear"
+ 
+ #: ../src/callbacks.c:2228
+ msgid "Use _radial gradient"
+-msgstr "Usar gradiante _radial"
++msgstr "Usar degradado radial"
+ 
+ #: ../src/callbacks.c:2258
+ msgid "Preview"
+-msgstr "Previsualizar"
++msgstr "Previo"
+ 
+ #. Display propert title depending on the callback that is calling this function.
+ #: ../src/new_slideshow.c:65
+ msgid "Project properties"
+-msgstr "Propiedades del proyecto"
++msgstr "Propiedades del Proyecto"
+ 
+ #: ../src/new_slideshow.c:85
+ msgid "<b>Slideshow Settings</b>"
+-msgstr "<b>Ajustes de la presentación de diapositivas</b>"
++msgstr "<b>Ajustes de Presentación</b>"
+ 
+ #: ../src/new_slideshow.c:130
++#, fuzzy
+ msgid "<b>Video Format</b>"
+-msgstr "<b>Formato de video</b>"
++msgstr "Formato de Video:"
+ 
+ #: ../src/new_slideshow.c:152 ../src/export.c:1337 ../src/export.c:1524
+ #: ../src/export.c:1705
++#, fuzzy
+ msgid "<b>Video Size</b>"
+-msgstr "<b>Calidad de video:</b>"
++msgstr "<b>Calidad del Vídeo:</b>"
+ 
+ #: ../src/new_slideshow.c:166
+ msgid "<b>Advanced Settings</b>"
+-msgstr "<b>Configuración avanzada</b>"
++msgstr "<b>Ajustes Avanzados</b>"
+ 
+ #: ../src/new_slideshow.c:173
+ msgid "Rescale images to fit desired aspect ratio"
+-msgstr "Reescalar imágenes para adaptarlas a la relación de aspecto"
++msgstr "Reescalar imágenes para ajustar proporción"
+ 
+ #: ../src/new_slideshow.c:179
+ msgid "Select background color:"
+-msgstr "Seleccione el color de fondo:"
++msgstr "Selecciona color de fondo:"
+ 
+ #: ../src/slideshow_project.c:213
+ msgid "This is not an Imagination project file!"
+-msgstr "Éste no es un archivo de un proyecto Imagination!"
++msgstr "¡No es un proyecto de Imagination!"
+ 
+ #: ../src/slideshow_project.c:371
+ #, c-format
+ msgid "Slide %i: can't load image %s\n"
+-msgstr ""
++msgstr "Diapositiva %i: no se puede cargar imagen %s\n"
+ 
+ #: ../src/slideshow_project.c:493
+ #, c-format
+ msgid "Can't load image %s\n"
+-msgstr ""
++msgstr "No se puede cargar imagen %s\n"
+ 
+ #: ../src/support.c:130
+-#, fuzzy, c-format
++#, c-format
+ msgid "Welcome to Imagination - %d transition loaded."
+ msgid_plural "Welcome to Imagination - %d transitions loaded."
+-msgstr[0] "Bienvenido a Imagination - %d transiciones cargadas."
++msgstr[0] "Bienvenido a Imagination - %d transición cargada."
+ msgstr[1] "Bienvenido a Imagination - %d transiciones cargadas."
+ 
+ #: ../src/support.c:141
+-#, fuzzy, c-format
++#, c-format
+ msgid "%d slide selected"
+ msgid_plural "%d slides selected"
+-msgstr[0] "%d diapositivas seleccionadas"
++msgstr[0] "%d diapositiva seleccionada"
+ msgstr[1] "%d diapositivas seleccionadas"
+ 
+ #: ../src/support.c:152
+-#, fuzzy, c-format
++#, c-format
+ msgid "%d slide loaded %s"
+ msgid_plural "%d slides loaded %s"
+-msgstr[0] "%d diapositiva importada %s"
+-msgstr[1] "%d diapositivas importadas %s"
++msgstr[0] "%d diapositiva cargada %s"
++msgstr[1] "%d diapositivas cargadas %s"
+ 
+ #: ../src/support.c:156
+ msgid " - Use the CTRL key to select/unselect or SHIFT for multiple select"
+ msgstr ""
+-" - Use la tecla CTRL para seleccionar/deseleccionar o MAYÚS para una "
+-"selección múltiple"
++" - Usar  CTRL para seleccionar/no seleccionar  o SHIFT para múltiples "
++"selecciones."
+ 
+ #: ../src/support.c:322
+ msgid "Please choose the slideshow project filename"
+-msgstr "Por favor, elija un nombre para la presentación de diapositivas"
++msgstr "Elige nombre para el proyecto"
+ 
+ #. This function call should be the first thing exporter does, since this
+ #. * function will take some preventive measures and also switches mode into
+ #. * preview if needed.
+ #: ../src/support.c:337 ../src/export.c:1183
++#, fuzzy
+ msgid "VOB (DVD video)"
+-msgstr ""
++msgstr "VOB (DVD video)"
+ 
+ #: ../src/support.c:343
+ msgid "MP4 (MPEG-4)"
+-msgstr ""
++msgstr "MP4 (MPEG-4)"
+ 
+ #. This function call should be the first thing exporter does, since this
+ #. * function will take some preventive measures.
+ #: ../src/support.c:349 ../src/export.c:1299
++#, fuzzy
+ msgid "OGV (Theora/Vorbis)"
+-msgstr ""
++msgstr "OGV (Theora/Vorbis)"
+ 
+ #. This function call should be the first thing exporter does, since this
+ #. * function will take some preventive measures.
+ #: ../src/support.c:355 ../src/export.c:1486
++#, fuzzy
+ msgid "FLV (Flash video)"
+-msgstr ""
++msgstr "FLV (Flash video)"
+ 
+ #. This function call should be the first thing exporter does, since this
+ #. * function will take some preventive measures.
+ #: ../src/support.c:361 ../src/export.c:1690
+ msgid "3GP (Mobile Phones)"
+-msgstr ""
++msgstr "3GP (Teléfonos Móviles)"
+ 
+ #: ../src/subtitles.c:166
+ msgid "Fade"
+-msgstr ""
++msgstr "Fundido"
+ 
+ #: ../src/subtitles.c:170
+ msgid "Slide from left"
+-msgstr ""
++msgstr "Entrar desde la izquierda"
+ 
+ #: ../src/subtitles.c:174
+ msgid "Slide from right"
+-msgstr ""
++msgstr "Entrar desde la derecha"
+ 
+ #: ../src/subtitles.c:178
+ msgid "Slide from top"
+-msgstr ""
++msgstr "Entrar desde arriba"
+ 
+ #: ../src/subtitles.c:182
+ msgid "Slide from bottom"
+-msgstr ""
++msgstr "Entrar desde abajo"
+ 
+ #: ../src/subtitles.c:186
+ msgid "Grow"
+-msgstr ""
++msgstr "Crecer"
+ 
+ #: ../src/export.c:150
+ msgid "<b>Export Settings</b>"
+-msgstr "<b>Configuración de la exportación</b>"
++msgstr "<b>Configuración para Exportar</b>"
+ 
+ #: ../src/export.c:164
+ msgid "Filename:"
+-msgstr ""
++msgstr "Archivo:"
+ 
+ #: ../src/export.c:312
+ msgid "Exporting the slideshow"
+-msgstr "Exportando la presentación de diapositivas"
++msgstr "Exportar presentación"
+ 
+ #: ../src/export.c:323
+ msgid "Preparing for export ..."
+@@ -737,25 +724,25 @@ msgstr "Preparando para exportar ..."
+ 
+ #: ../src/export.c:334
+ msgid "Overall progress:"
+-msgstr "Progreso global:"
++msgstr "Progreso general:"
+ 
+ #: ../src/export.c:424 ../src/export.c:807
+ #, c-format
+ msgid "Slide %d export progress:"
+-msgstr "Progreso de exportación de la diapositiva %d:"
++msgstr "Diapositiva %d progreso exportar:"
+ 
+ #: ../src/export.c:661
+ msgid "Failed to launch the encoder!"
+-msgstr "Error al iniciar el codificador!"
++msgstr "¡Errar al lanzar el codificador!"
+ 
+ #: ../src/export.c:805
+ #, c-format
+ msgid "Final transition export progress:"
+-msgstr "Progreso de exportación de la transición final:"
++msgstr "Fin de transición:"
+ 
+ #: ../src/export.c:1195
+ msgid "<b>Television Format</b>"
+-msgstr "<b>Formato de televisión</b>"
++msgstr "<b>Formato de Television</b>"
+ 
+ #: ../src/export.c:1202 ../src/export.c:1326 ../src/export.c:1513
+ msgid "Normal 4:3"
+@@ -768,74 +755,75 @@ msgstr "Panorámico 16:9"
+ #: ../src/export.c:1315 ../src/export.c:1502
+ #, fuzzy
+ msgid "<b>Aspect Ratio</b>"
+-msgstr "<b>Movimiento de las diapositivas</b>"
++msgstr "Proporción Aspecto:"
+ 
+ #: ../src/export.c:1373 ../src/export.c:1557
+ msgid "<b>Video Quality:</b>"
+-msgstr "<b>Calidad de video:</b>"
++msgstr "<b>Calidad del Vídeo:</b>"
+ 
+ #: ../src/export.c:1380 ../src/export.c:1564
+ msgid "Low"
+-msgstr "Baja"
++msgstr "Bajo"
+ 
+ #: ../src/export.c:1384 ../src/export.c:1568
+ msgid "Medium"
+-msgstr "Media"
++msgstr "Medio"
++
++#~ msgid "Video Size:"
++#~ msgstr "Tamaño de Video:"
++
++#~ msgid "Frames per Second (FPS):"
++#~ msgstr "Cuadro por segundo:"
++
++#, fuzzy
++#~ msgid "low"
++#~ msgstr "Lento"
+ 
+ #~ msgid "Rotate the slide clockwise"
+-#~ msgstr "Rotar la diapositiva en el sentido horario"
++#~ msgstr "Rotate the slide clockwise"
+ 
+ #~ msgid "Goto first slide"
+-#~ msgstr "Ir a la primera diapositiva"
++#~ msgstr "Goto first slide"
+ 
+ #~ msgid "Goto last slide"
+-#~ msgstr "Ir a la última diapositiva"
++#~ msgstr "Goto last slide"
+ 
+ #~ msgid "Please choose the audio files to import"
+-#~ msgstr "Por favor, elija los archivos de audio a importar"
++#~ msgstr "Please choose the audio files to import"
+ 
+ #~ msgid "VOB export"
+-#~ msgstr "Exportar VOB"
++#~ msgstr "VOB Export"
+ 
+ #~ msgid "OGG export"
+-#~ msgstr "Exportar OGG"
++#~ msgstr "OGG Export"
+ 
+ #~ msgid "FLV export"
+-#~ msgstr "Exportar FLV"
++#~ msgstr "FLV Export"
+ 
+ #~ msgid "An error occurred while trying to rotate the slide:"
+-#~ msgstr "Ocurrió un error al intentar rotar la diapositiva:"
+-
+-#, fuzzy
+-#~ msgid "Sorry,I could not perform the operation!"
+-#~ msgstr "Lo siento, ¡No puedo realizar la operación!"
++#~ msgstr "An error occurred while trying to rotate the slide:"
+ 
+ #~ msgid "Slide Number:"
+-#~ msgstr "Número de la diapositiva:"
++#~ msgstr "Slide Number:"
+ 
+ #~ msgid "Jump to the entered slide number"
+-#~ msgstr "Ir al nº de diapositiva introducido"
++#~ msgstr "Jump to the entered slide number"
+ 
+ #~ msgid "Export the DVD slideshow"
+-#~ msgstr "Exportar la presentación de diapositiva en DVD"
++#~ msgstr "Export the DVD slideshow"
+ 
+ #~ msgid ""
+ #~ "The length of the audio track is longer than the video one. Do you want "
+ #~ "to continue?"
+ #~ msgstr ""
+-#~ "La duración de la pista de audio es más larga que la de video. ¿Desea "
+-#~ "continuar?"
++#~ "The lenght of the audio track is longer than the video one. Do you want "
++#~ "to continue?"
+ 
+ #~ msgid "Export the slideshow as:"
+-#~ msgstr "Exportar la presentación de diapositivas como:"
++#~ msgstr "Export the slideshow as:"
+ 
+-#, fuzzy
+-#~ msgid "Import the audio files"
+-#~ msgstr "Importar diapositivas"
++#~ msgid "Can't read file header!"
++#~ msgstr "Can't read file header!"
+ 
+-#~ msgid "Preview the slideshow"
+-#~ msgstr "Previsualizar pase de diapositivas"
+-
+-#, fuzzy
+-#~ msgid "Clear the selection"
+-#~ msgstr "Elminar diapositivas seleccionadas"
++#~ msgid "Import the audio files"
++#~ msgstr "Import the audio files"
+diff --git a/po/fr.po b/po/fr.po
+index 0acdd7a..a113606 100644
+--- a/po/fr.po
++++ b/po/fr.po
+@@ -10,7 +10,7 @@ msgstr ""
+ "Project-Id-Version: imagination 1.5\n"
+ "Report-Msgid-Bugs-To: \n"
+ "POT-Creation-Date: 2011-02-18 20:10+0100\n"
+-"PO-Revision-Date: 2011-02-13 23:20+0100\n"
++"PO-Revision-Date: 2011-06-11 20:35+0100\n"
+ "Last-Translator: Robert Chéramy <robert@cheramy.net>\n"
+ "Language-Team: GNOME French Team <gnomefr@traduc.org>\n"
+ "Language: \n"
+@@ -550,8 +550,9 @@ msgid "Save an Imagination slideshow project"
+ msgstr "Sauvegarde un projet Imagination"
+ 
+ #: ../src/callbacks.c:1443
++#, fuzzy
+ msgid "Imagination projects"
+-msgstr "Projets Imagination"
++msgstr "Projets Imagination (*.img)"
+ 
+ #: ../src/callbacks.c:2195
+ msgid "Create empty slide"
+@@ -587,13 +588,15 @@ msgid "<b>Slideshow Settings</b>"
+ msgstr "<b>Paramètres de la présentation</b>"
+ 
+ #: ../src/new_slideshow.c:130
++#, fuzzy
+ msgid "<b>Video Format</b>"
+-msgstr "<b>Format vidéo</b>"
++msgstr "Format vidéo :"
+ 
+ #: ../src/new_slideshow.c:152 ../src/export.c:1337 ../src/export.c:1524
+ #: ../src/export.c:1705
++#, fuzzy
+ msgid "<b>Video Size</b>"
+-msgstr "<b>Taille de la vidéo</b>"
++msgstr "<b>Qualité vidéo :</b>"
+ 
+ #: ../src/new_slideshow.c:166
+ msgid "<b>Advanced Settings</b>"
+@@ -656,6 +659,7 @@ msgstr "Choisissez le nom de fichier de votre projet"
+ #. * function will take some preventive measures and also switches mode into
+ #. * preview if needed.
+ #: ../src/support.c:337 ../src/export.c:1183
++#, fuzzy
+ msgid "VOB (DVD video)"
+ msgstr "VOB (DVD video)"
+ 
+@@ -666,12 +670,14 @@ msgstr "MP4 (MPEG-4)"
+ #. This function call should be the first thing exporter does, since this
+ #. * function will take some preventive measures.
+ #: ../src/support.c:349 ../src/export.c:1299
++#, fuzzy
+ msgid "OGV (Theora/Vorbis)"
+ msgstr "OGV (Theora/Vorbis)"
+ 
+ #. This function call should be the first thing exporter does, since this
+ #. * function will take some preventive measures.
+ #: ../src/support.c:355 ../src/export.c:1486
++#, fuzzy
+ msgid "FLV (Flash video)"
+ msgstr "FLV (Flash video)"
+ 
+@@ -679,7 +685,7 @@ msgstr "FLV (Flash video)"
+ #. * function will take some preventive measures.
+ #: ../src/support.c:361 ../src/export.c:1690
+ msgid "3GP (Mobile Phones)"
+-msgstr "3GP (Mobile Phones)"
++msgstr "3GP (téléphones portables)"
+ 
+ #: ../src/subtitles.c:166
+ msgid "Fade"
+@@ -752,8 +758,9 @@ msgid "Widescreen 16:9"
+ msgstr "Écran large 16:9"
+ 
+ #: ../src/export.c:1315 ../src/export.c:1502
++#, fuzzy
+ msgid "<b>Aspect Ratio</b>"
+-msgstr "<b>rapport hauteur/largeur</b>"
++msgstr "Rapport hauteur/largeur :"
+ 
+ #: ../src/export.c:1373 ../src/export.c:1557
+ msgid "<b>Video Quality:</b>"
+@@ -767,6 +774,37 @@ msgstr "Basse"
+ msgid "Medium"
+ msgstr "Moyenne"
+ 
++#~ msgid "Video Size:"
++#~ msgstr "Taille de la vidéo :"
++
++#~ msgid "Frames per Second (FPS):"
++#~ msgstr "Images par seconde (FPS):"
++
++#~ msgid "Bitrate:"
++#~ msgstr "Débit :"
++
++#~ msgid "512 kbps (low)"
++#~ msgstr "512 kbps (faible)"
++
++#~ msgid "1024 kbps (medium)"
++#~ msgstr "1024 kbps (moyen)"
++
++#~ msgid "2048 kbps (high)"
++#~ msgstr "2048 kbps (haut)"
++
++#~ msgid "384 kbps (low)"
++#~ msgstr "384 kbps (faible)"
++
++#~ msgid "768 kbps (medium)"
++#~ msgstr "768 kbps (moyen)"
++
++#~ msgid "1536 kbps (high)"
++#~ msgstr "1536 kbps (haut)"
++
++#, fuzzy
++#~ msgid "low"
++#~ msgstr "Lente"
++
+ #~ msgid "Rotate the slide clockwise"
+ #~ msgstr "Rotation de la diapositive dans le sens horaire"
+ 
+diff --git a/po/imagination.pot b/po/imagination.pot
+index c4c8b77..e9a8bd9 100644
+--- a/po/imagination.pot
++++ b/po/imagination.pot
+@@ -6,7 +6,7 @@
+ #, fuzzy
+ msgid ""
+ msgstr ""
+-"Project-Id-Version: PACKAGE VERSION\n"
++"Project-Id-Version: imagination 3.0\n"
+ "Report-Msgid-Bugs-To: \n"
+ "POT-Creation-Date: 2011-02-18 20:10+0100\n"
+ "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+@@ -14,9 +14,9 @@ msgstr ""
+ "Language-Team: LANGUAGE <LL@li.org>\n"
+ "Language: \n"
+ "MIME-Version: 1.0\n"
+-"Content-Type: text/plain; charset=CHARSET\n"
++"Content-Type: text/plain; charset=UTF-8\n"
+ "Content-Transfer-Encoding: 8bit\n"
+-"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
++"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+ 
+ #: ../imagination.desktop.in.h:1
+ msgid "A DVD slideshow maker"
+diff --git a/po/it.po b/po/it.po
+index 0c6b55d..fe0ae02 100644
+--- a/po/it.po
++++ b/po/it.po
+@@ -8,8 +8,8 @@ msgstr ""
+ "Project-Id-Version: imagination 1.0\n"
+ "Report-Msgid-Bugs-To: \n"
+ "POT-Creation-Date: 2011-02-18 20:10+0100\n"
+-"PO-Revision-Date: 2011-02-19 15:07+0100\n"
+-"Last-Translator: \n"
++"PO-Revision-Date: 2011-06-11 20:47+0100\n"
++"Last-Translator: Robert Chéramy <robert@cheramy.net>\n"
+ "Language-Team: Italian\n"
+ "Language: \n"
+ "MIME-Version: 1.0\n"
+@@ -542,8 +542,9 @@ msgid "Save an Imagination slideshow project"
+ msgstr "Salva una presentazione di Imagination"
+ 
+ #: ../src/callbacks.c:1443
++#, fuzzy
+ msgid "Imagination projects"
+-msgstr "Progetti di Imagination"
++msgstr "Progetti di Imagination (*.img)"
+ 
+ #: ../src/callbacks.c:2195
+ msgid "Create empty slide"
+@@ -579,13 +580,15 @@ msgid "<b>Slideshow Settings</b>"
+ msgstr "<b>Impostazioni Presentazione</b>"
+ 
+ #: ../src/new_slideshow.c:130
++#, fuzzy
+ msgid "<b>Video Format</b>"
+-msgstr "<b>Formato del video</b>"
++msgstr "Formato del video:"
+ 
+ #: ../src/new_slideshow.c:152 ../src/export.c:1337 ../src/export.c:1524
+ #: ../src/export.c:1705
++#, fuzzy
+ msgid "<b>Video Size</b>"
+-msgstr "<b>Dimensioni del video</b>"
++msgstr "<b>Qualità del video</b>"
+ 
+ #: ../src/new_slideshow.c:166
+ msgid "<b>Advanced Settings</b>"
+@@ -648,6 +651,7 @@ msgstr "Prego scegliere il nome del file della presentazione"
+ #. * function will take some preventive measures and also switches mode into
+ #. * preview if needed.
+ #: ../src/support.c:337 ../src/export.c:1183
++#, fuzzy
+ msgid "VOB (DVD video)"
+ msgstr "VOB (DVD video)"
+ 
+@@ -658,12 +662,14 @@ msgstr "MP4 (MPEG-4)"
+ #. This function call should be the first thing exporter does, since this
+ #. * function will take some preventive measures.
+ #: ../src/support.c:349 ../src/export.c:1299
++#, fuzzy
+ msgid "OGV (Theora/Vorbis)"
+ msgstr "OGV (Theora/Vorbis)"
+ 
+ #. This function call should be the first thing exporter does, since this
+ #. * function will take some preventive measures.
+ #: ../src/support.c:355 ../src/export.c:1486
++#, fuzzy
+ msgid "FLV (Flash video)"
+ msgstr "FLV (Flash Video)"
+ 
+@@ -744,8 +750,9 @@ msgid "Widescreen 16:9"
+ msgstr "Widescreen 16:9"
+ 
+ #: ../src/export.c:1315 ../src/export.c:1502
++#, fuzzy
+ msgid "<b>Aspect Ratio</b>"
+-msgstr "<b>Proporzione</b>"
++msgstr "Proporzione:"
+ 
+ #: ../src/export.c:1373 ../src/export.c:1557
+ msgid "<b>Video Quality:</b>"
+@@ -759,6 +766,16 @@ msgstr "Bassa"
+ msgid "Medium"
+ msgstr "Media"
+ 
++#~ msgid "Video Size:"
++#~ msgstr "Dimensioni del video:"
++
++#~ msgid "Frames per Second (FPS):"
++#~ msgstr "Fotogramma per secondo:"
++
++#, fuzzy
++#~ msgid "low"
++#~ msgstr "Lenta"
++
+ #~ msgid "Rotate the slide clockwise"
+ #~ msgstr "Ruota la diapositiva senso antiorario"
+ 
+diff --git a/po/ja.po b/po/ja.po
+index 069bfc6..781f249 100644
+--- a/po/ja.po
++++ b/po/ja.po
+@@ -591,13 +591,15 @@ msgid "<b>Slideshow Settings</b>"
+ msgstr "<b>スライドショーの設定</b>"
+ 
+ #: ../src/new_slideshow.c:130
++#, fuzzy
+ msgid "<b>Video Format</b>"
+ msgstr "<b>ビデオのタイプ</b>"
+ 
+ #: ../src/new_slideshow.c:152 ../src/export.c:1337 ../src/export.c:1524
+ #: ../src/export.c:1705
++#, fuzzy
+ msgid "<b>Video Size</b>"
+-msgstr "<b>ビデオのサイズ</b>"
++msgstr "<b>ビデオ画質:</b>"
+ 
+ #: ../src/new_slideshow.c:166
+ msgid "<b>Advanced Settings</b>"
+@@ -772,6 +774,10 @@ msgstr "低"
+ msgid "Medium"
+ msgstr "中"
+ 
++#, fuzzy
++#~ msgid "Video Size:"
++#~ msgstr "<b>ビデオのサイズ</b>"
++
+ #~ msgid "Rotate the slide clockwise"
+ #~ msgstr "スライド時計回り"
+ 
+diff --git a/po/ku.po b/po/ku.po
+index a28e58c..125dba7 100644
+--- a/po/ku.po
++++ b/po/ku.po
+@@ -582,13 +582,15 @@ msgid "<b>Slideshow Settings</b>"
+ msgstr "<b>Mîhengên Pêşandana Slaytan</b>"
+ 
+ #: ../src/new_slideshow.c:130
++#, fuzzy
+ msgid "<b>Video Format</b>"
+ msgstr "<b>Formata Vîdyoyê</b>"
+ 
+ #: ../src/new_slideshow.c:152 ../src/export.c:1337 ../src/export.c:1524
+ #: ../src/export.c:1705
++#, fuzzy
+ msgid "<b>Video Size</b>"
+-msgstr "<b>Mezinahiya vîdyoyê</b>"
++msgstr "<b>Qalîteya Vîdyoyê:</b>"
+ 
+ #: ../src/new_slideshow.c:166
+ msgid "<b>Advanced Settings</b>"
+@@ -762,6 +764,10 @@ msgid "Medium"
+ msgstr "Navincî"
+ 
+ #, fuzzy
++#~ msgid "Video Size:"
++#~ msgstr "<b>Mezinahiya vîdyoyê</b>"
++
++#, fuzzy
+ #~ msgid "VOB (DVD Video)"
+ #~ msgstr "VOB (Vîdyoyên DVD)"
+ 
+diff --git a/po/pt_BR.po b/po/pt_BR.po
+index 672d1d8..e9a1d3b 100644
+--- a/po/pt_BR.po
++++ b/po/pt_BR.po
+@@ -10,8 +10,8 @@ msgstr ""
+ "Project-Id-Version: \n"
+ "Report-Msgid-Bugs-To: \n"
+ "POT-Creation-Date: 2011-02-18 20:10+0100\n"
+-"PO-Revision-Date: 2011-02-25 09:18-0500\n"
+-"Last-Translator: Og Maciel <ogmaciel@gnome.org>\n"
++"PO-Revision-Date: 2011-06-11 20:51+0100\n"
++"Last-Translator: Robert Chéramy <robert@cheramy.net>\n"
+ "Language-Team: Brazilian Portuguese <ldp-br@bazar2.conectiva.com.br>\n"
+ "Language: pt_BR\n"
+ "MIME-Version: 1.0\n"
+@@ -550,8 +550,9 @@ msgid "Save an Imagination slideshow project"
+ msgstr "Salvar um projeto de apresentação de slides do Imagination"
+ 
+ #: ../src/callbacks.c:1443
++#, fuzzy
+ msgid "Imagination projects"
+-msgstr "Projetos Imagination"
++msgstr "Projetos Imagination (*.img)"
+ 
+ #: ../src/callbacks.c:2195
+ msgid "Create empty slide"
+@@ -587,13 +588,15 @@ msgid "<b>Slideshow Settings</b>"
+ msgstr "<b>Configurações da apresentação de slides</b>"
+ 
+ #: ../src/new_slideshow.c:130
++#, fuzzy
+ msgid "<b>Video Format</b>"
+-msgstr "<b>Formato do vídeo</b>"
++msgstr "Formato do vídeo:"
+ 
+ #: ../src/new_slideshow.c:152 ../src/export.c:1337 ../src/export.c:1524
+ #: ../src/export.c:1705
++#, fuzzy
+ msgid "<b>Video Size</b>"
+-msgstr "<b>Tamanho do vídeo</b>"
++msgstr "<b>Qualidade do vídeo:</b>"
+ 
+ #: ../src/new_slideshow.c:166
+ msgid "<b>Advanced Settings</b>"
+@@ -753,8 +756,9 @@ msgid "Widescreen 16:9"
+ msgstr "Tela ampla 16:9"
+ 
+ #: ../src/export.c:1315 ../src/export.c:1502
++#, fuzzy
+ msgid "<b>Aspect Ratio</b>"
+-msgstr "<b>Proporção de tela</b>"
++msgstr "Proporção de tela:"
+ 
+ #: ../src/export.c:1373 ../src/export.c:1557
+ msgid "<b>Video Quality:</b>"
+@@ -768,18 +772,25 @@ msgstr "Baixa"
+ msgid "Medium"
+ msgstr "Média"
+ 
+-#, fuzzy
++#~ msgid "Video Size:"
++#~ msgstr "Tamanho do vídeo:"
++
++#~ msgid "Frames per Second (FPS):"
++#~ msgstr "Quadro por segundo:"
++
+ #~ msgid "VOB (DVD Video)"
+ #~ msgstr "VOB (vídeo DVD)"
+ 
+-#, fuzzy
+ #~ msgid "OGV (Theora Vorbis)"
+ #~ msgstr "OGV (Theora/Vorbis)"
+ 
+-#, fuzzy
+ #~ msgid "FLV (Flash Video)"
+ #~ msgstr "FLV (vídeo Flash)"
+ 
++#, fuzzy
++#~ msgid "low"
++#~ msgstr "Lenta"
++
+ #~ msgid "Rotate the slide clockwise"
+ #~ msgstr "Rotacionar o slide no sentido horário"
+ 
+diff --git a/po/ru.po b/po/ru.po
+index 17a6df0..224acc0 100644
+--- a/po/ru.po
++++ b/po/ru.po
+@@ -594,13 +594,15 @@ msgid "<b>Slideshow Settings</b>"
+ msgstr "<b>Параметры Слайд-шоу</b>"
+ 
+ #: ../src/new_slideshow.c:130
++#, fuzzy
+ msgid "<b>Video Format</b>"
+ msgstr "<b>Видео формат</b>"
+ 
+ #: ../src/new_slideshow.c:152 ../src/export.c:1337 ../src/export.c:1524
+ #: ../src/export.c:1705
++#, fuzzy
+ msgid "<b>Video Size</b>"
+-msgstr "<b>Размер видео</b>"
++msgstr "<b>Качество видео:</b>"
+ 
+ #: ../src/new_slideshow.c:166
+ msgid "<b>Advanced Settings</b>"
+@@ -778,6 +780,10 @@ msgstr "Низкое"
+ msgid "Medium"
+ msgstr "Среднее"
+ 
++#, fuzzy
++#~ msgid "Video Size:"
++#~ msgstr "<b>Размер видео</b>"
++
+ #~ msgid "Rotate the slide clockwise"
+ #~ msgstr "Повернуть слайд по часовой стрелке"
+ 
+diff --git a/po/sl_SI.po b/po/sl_SI.po
+index 8590ebc..bf403d76 100644
+--- a/po/sl_SI.po
++++ b/po/sl_SI.po
+@@ -595,13 +595,15 @@ msgid "<b>Slideshow Settings</b>"
+ msgstr "<b>Nastavitve diaprojekcije</b>"
+ 
+ #: ../src/new_slideshow.c:130
++#, fuzzy
+ msgid "<b>Video Format</b>"
+ msgstr "<b>Video oblika</b>"
+ 
+ #: ../src/new_slideshow.c:152 ../src/export.c:1337 ../src/export.c:1524
+ #: ../src/export.c:1705
++#, fuzzy
+ msgid "<b>Video Size</b>"
+-msgstr "<b>Velikost videa:</b>"
++msgstr "<b>Kvaliteta videa:</b>"
+ 
+ #: ../src/new_slideshow.c:166
+ msgid "<b>Advanced Settings</b>"
+@@ -780,6 +782,10 @@ msgstr "Nizka"
+ msgid "Medium"
+ msgstr "Srednja"
+ 
++#, fuzzy
++#~ msgid "Video Size:"
++#~ msgstr "<b>Velikost videa:</b>"
++
+ #~ msgid "Rotate the slide clockwise"
+ #~ msgstr "Zavrti diapozitiv v smeri urinega kazalca"
+ 
+diff --git a/po/sv.po b/po/sv.po
+index 464b427..188f472 100644
+--- a/po/sv.po
++++ b/po/sv.po
+@@ -8,12 +8,12 @@ msgstr ""
+ "Project-Id-Version: imagination\n"
+ "Report-Msgid-Bugs-To: \n"
+ "POT-Creation-Date: 2011-02-18 20:10+0100\n"
+-"PO-Revision-Date: 2011-02-18 19:02+0100\n"
+-"Last-Translator: Daniel Nylander <po@danielnylander.se>\n"
++"PO-Revision-Date: 2011-06-11 20:51+0100\n"
++"Last-Translator: Robert Chéramy <robert@cheramy.net>\n"
+ "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
+ "Language: sv\n"
+ "MIME-Version: 1.0\n"
+-"Content-Type: text/plain; charset=utf-8\n"
++"Content-Type: text/plain; charset=UTF-8\n"
+ "Content-Transfer-Encoding: 8bit\n"
+ "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+ 
+@@ -546,8 +546,9 @@ msgid "Save an Imagination slideshow project"
+ msgstr "Spara ett Imagination-bildspelsprojekt"
+ 
+ #: ../src/callbacks.c:1443
++#, fuzzy
+ msgid "Imagination projects"
+-msgstr "Imagination-projekt"
++msgstr "Imagination-projekt (*.img)"
+ 
+ #: ../src/callbacks.c:2195
+ msgid "Create empty slide"
+@@ -583,13 +584,15 @@ msgid "<b>Slideshow Settings</b>"
+ msgstr "<b>Bildspelsinställningar</b>"
+ 
+ #: ../src/new_slideshow.c:130
++#, fuzzy
+ msgid "<b>Video Format</b>"
+-msgstr "<b>Videoformat</b>"
++msgstr "Videoformat:"
+ 
+ #: ../src/new_slideshow.c:152 ../src/export.c:1337 ../src/export.c:1524
+ #: ../src/export.c:1705
++#, fuzzy
+ msgid "<b>Video Size</b>"
+-msgstr "<b>Videostorlek</b>"
++msgstr "<b>Videokvalitet:</b>"
+ 
+ #: ../src/new_slideshow.c:166
+ msgid "<b>Advanced Settings</b>"
+@@ -652,6 +655,7 @@ msgstr "Välj filnamn för bildspelsprojektet"
+ #. * function will take some preventive measures and also switches mode into
+ #. * preview if needed.
+ #: ../src/support.c:337 ../src/export.c:1183
++#, fuzzy
+ msgid "VOB (DVD video)"
+ msgstr "VOB (DVD-video)"
+ 
+@@ -662,12 +666,14 @@ msgstr "MP4 (MPEG-4)"
+ #. This function call should be the first thing exporter does, since this
+ #. * function will take some preventive measures.
+ #: ../src/support.c:349 ../src/export.c:1299
++#, fuzzy
+ msgid "OGV (Theora/Vorbis)"
+ msgstr "OGV (Theora/Vorbis)"
+ 
+ #. This function call should be the first thing exporter does, since this
+ #. * function will take some preventive measures.
+ #: ../src/support.c:355 ../src/export.c:1486
++#, fuzzy
+ msgid "FLV (Flash video)"
+ msgstr "FLV (Flash Video)"
+ 
+@@ -748,8 +754,9 @@ msgid "Widescreen 16:9"
+ msgstr "Bredbild 16:9"
+ 
+ #: ../src/export.c:1315 ../src/export.c:1502
++#, fuzzy
+ msgid "<b>Aspect Ratio</b>"
+-msgstr "<b>Bildförhållande</b>"
++msgstr "Bildförhållande:"
+ 
+ #: ../src/export.c:1373 ../src/export.c:1557
+ msgid "<b>Video Quality:</b>"
+@@ -763,6 +770,16 @@ msgstr "Låg"
+ msgid "Medium"
+ msgstr "Medel"
+ 
++#~ msgid "Video Size:"
++#~ msgstr "Videostorlek:"
++
++#~ msgid "Frames per Second (FPS):"
++#~ msgstr "Bild per sekund:"
++
++#, fuzzy
++#~ msgid "low"
++#~ msgstr "Långsam"
++
+ #~ msgid "Rotate the slide clockwise"
+ #~ msgstr "Rotera bilden medsols"
+ 
+diff --git a/po/zh_CN.po b/po/zh_CN.po
+index 47caaef..35b6ba6 100644
+--- a/po/zh_CN.po
++++ b/po/zh_CN.po
+@@ -8,14 +8,14 @@ msgstr ""
+ "Project-Id-Version: \n"
+ "Report-Msgid-Bugs-To: \n"
+ "POT-Creation-Date: 2011-02-18 20:10+0100\n"
+-"PO-Revision-Date: 2011-02-19 01:00+0800\n"
+-"Last-Translator: chiming <tw.chi.ming@gmail.com>\n"
++"PO-Revision-Date: 2011-06-11 20:49+0100\n"
++"Last-Translator: Robert Chéramy <robert@cheramy.net>\n"
+ "Language-Team: Chinese Simplified\n"
+ "Language: zh_CN\n"
+ "MIME-Version: 1.0\n"
+ "Content-Type: text/plain; charset=UTF-8\n"
+ "Content-Transfer-Encoding: 8bit\n"
+-"Plural-Forms: nplurals=1; plural=0; \n"
++"Plural-Forms: nplurals=1; plural=0;\n"
+ "X-Language: zh_CN\n"
+ 
+ #: ../imagination.desktop.in.h:1
+@@ -537,8 +537,9 @@ msgid "Save an Imagination slideshow project"
+ msgstr "储存一个影片秀专案"
+ 
+ #: ../src/callbacks.c:1443
++#, fuzzy
+ msgid "Imagination projects"
+-msgstr "Imagination 想像"
++msgstr "Imagination 想像 (*.img)"
+ 
+ #: ../src/callbacks.c:2195
+ msgid "Create empty slide"
+@@ -574,13 +575,15 @@ msgid "<b>Slideshow Settings</b>"
+ msgstr "<b>影片秀设定</b>"
+ 
+ #: ../src/new_slideshow.c:130
++#, fuzzy
+ msgid "<b>Video Format</b>"
+-msgstr "<b>影片格式</b>"
++msgstr "影片格式:"
+ 
+ #: ../src/new_slideshow.c:152 ../src/export.c:1337 ../src/export.c:1524
+ #: ../src/export.c:1705
++#, fuzzy
+ msgid "<b>Video Size</b>"
+-msgstr "<b>影片大小:</b>"
++msgstr "<b>影片品质:</b>"
+ 
+ #: ../src/new_slideshow.c:166
+ msgid "<b>Advanced Settings</b>"
+@@ -639,6 +642,7 @@ msgstr "请选择专案档名"
+ #. * function will take some preventive measures and also switches mode into
+ #. * preview if needed.
+ #: ../src/support.c:337 ../src/export.c:1183
++#, fuzzy
+ msgid "VOB (DVD video)"
+ msgstr "VOB (DVD影音格式)"
+ 
+@@ -649,12 +653,14 @@ msgstr "MP4 (影音格式)"
+ #. This function call should be the first thing exporter does, since this
+ #. * function will take some preventive measures.
+ #: ../src/support.c:349 ../src/export.c:1299
++#, fuzzy
+ msgid "OGV (Theora/Vorbis)"
+ msgstr "OGV(开放影音格式)"
+ 
+ #. This function call should be the first thing exporter does, since this
+ #. * function will take some preventive measures.
+ #: ../src/support.c:355 ../src/export.c:1486
++#, fuzzy
+ msgid "FLV (Flash video)"
+ msgstr "FLV (串流媒体格式)"
+ 
+@@ -735,8 +741,9 @@ msgid "Widescreen 16:9"
+ msgstr "宽萤幕 16:9"
+ 
+ #: ../src/export.c:1315 ../src/export.c:1502
++#, fuzzy
+ msgid "<b>Aspect Ratio</b>"
+-msgstr "<b>场景变化</b>"
++msgstr "场景变化:"
+ 
+ #: ../src/export.c:1373 ../src/export.c:1557
+ msgid "<b>Video Quality:</b>"
+@@ -749,3 +756,14 @@ msgstr "低"
+ #: ../src/export.c:1384 ../src/export.c:1568
+ msgid "Medium"
+ msgstr "中"
++
++#~ msgid "Video Size:"
++#~ msgstr "影片大小:"
++
++#, fuzzy
++#~ msgid "Frames per Second (FPS):"
++#~ msgstr "每秒 %d 画面"
++
++#, fuzzy
++#~ msgid "low"
++#~ msgstr "慢"
+diff --git a/po/zh_TW.po b/po/zh_TW.po
+index f923490..ecb825a 100644
+--- a/po/zh_TW.po
++++ b/po/zh_TW.po
+@@ -8,14 +8,14 @@ msgstr ""
+ "Project-Id-Version: \n"
+ "Report-Msgid-Bugs-To: \n"
+ "POT-Creation-Date: 2011-02-18 20:10+0100\n"
+-"PO-Revision-Date: 2011-02-19 01:00+0800\n"
+-"Last-Translator: chiming <tw.chi.ming@gmail.com>\n"
++"PO-Revision-Date: 2011-06-11 20:50+0100\n"
++"Last-Translator: Robert Chéramy <robert@cheramy.net>\n"
+ "Language-Team: Chinese Traditional\n"
+ "Language: zh_TW\n"
+ "MIME-Version: 1.0\n"
+ "Content-Type: text/plain; charset=UTF-8\n"
+ "Content-Transfer-Encoding: 8bit\n"
+-"Plural-Forms: nplurals=1; plural=0; \n"
++"Plural-Forms: nplurals=1; plural=0;\n"
+ "X-Language: zh_TW\n"
+ 
+ #: ../imagination.desktop.in.h:1
+@@ -537,8 +537,9 @@ msgid "Save an Imagination slideshow project"
+ msgstr "儲存一個影片秀專案"
+ 
+ #: ../src/callbacks.c:1443
++#, fuzzy
+ msgid "Imagination projects"
+-msgstr "Imagination 想像"
++msgstr "Imagination 想像 (*.img)"
+ 
+ #: ../src/callbacks.c:2195
+ msgid "Create empty slide"
+@@ -574,13 +575,15 @@ msgid "<b>Slideshow Settings</b>"
+ msgstr "<b>影片秀設定</b>"
+ 
+ #: ../src/new_slideshow.c:130
++#, fuzzy
+ msgid "<b>Video Format</b>"
+-msgstr "<b>影片格式</b>"
++msgstr "影片格式:"
+ 
+ #: ../src/new_slideshow.c:152 ../src/export.c:1337 ../src/export.c:1524
+ #: ../src/export.c:1705
++#, fuzzy
+ msgid "<b>Video Size</b>"
+-msgstr "<b>影片大小:</b>"
++msgstr "<b>影片品質:</b>"
+ 
+ #: ../src/new_slideshow.c:166
+ msgid "<b>Advanced Settings</b>"
+@@ -639,6 +642,7 @@ msgstr "請選擇專案檔名"
+ #. * function will take some preventive measures and also switches mode into
+ #. * preview if needed.
+ #: ../src/support.c:337 ../src/export.c:1183
++#, fuzzy
+ msgid "VOB (DVD video)"
+ msgstr "VOB (DVD影音格式)"
+ 
+@@ -649,12 +653,14 @@ msgstr "MP4 (影音格式)"
+ #. This function call should be the first thing exporter does, since this
+ #. * function will take some preventive measures.
+ #: ../src/support.c:349 ../src/export.c:1299
++#, fuzzy
+ msgid "OGV (Theora/Vorbis)"
+ msgstr "OGV(開放影音格式)"
+ 
+ #. This function call should be the first thing exporter does, since this
+ #. * function will take some preventive measures.
+ #: ../src/support.c:355 ../src/export.c:1486
++#, fuzzy
+ msgid "FLV (Flash video)"
+ msgstr "FLV (串流媒體格式)"
+ 
+@@ -735,8 +741,9 @@ msgid "Widescreen 16:9"
+ msgstr "寬螢幕 16:9"
+ 
+ #: ../src/export.c:1315 ../src/export.c:1502
++#, fuzzy
+ msgid "<b>Aspect Ratio</b>"
+-msgstr "<b>場景變化</b>"
++msgstr "場景變化:"
+ 
+ #: ../src/export.c:1373 ../src/export.c:1557
+ msgid "<b>Video Quality:</b>"
+@@ -749,3 +756,14 @@ msgstr "低"
+ #: ../src/export.c:1384 ../src/export.c:1568
+ msgid "Medium"
+ msgstr "中"
++
++#~ msgid "Video Size:"
++#~ msgstr "影片大小:"
++
++#, fuzzy
++#~ msgid "Frames per Second (FPS):"
++#~ msgstr "每秒 %d 畫面"
++
++#, fuzzy
++#~ msgid "low"
++#~ msgstr "慢"
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 9064348..4953e47 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -24,9 +24,10 @@ imagination_SOURCES = \
+ 	subtitles.c subtitles.h \
+ 	imgtablebutton.c imgtablebutton.h \
+ 	imgcellrendererpixbuf.c imgcellrendererpixbuf.h \
+-	img_sox.c img_sox.h
++	img_sox.c img_sox.h \
++	video_formats.c video_formats.h
+ 
+ imagination_CFLAGS = \
+ 	-DDATADIR=\"$(datadir)\"
+ 
+-imagination_LDADD = @PACKAGE_LIBS@ @SOX_LIBS@ $(INTLLIBS)
++imagination_LDADD = @PACKAGE_LIBS@ @SOX_LIBS@ $(INTLLIBS) -lgmodule-2.0 -lm
+diff --git a/src/callbacks.c b/src/callbacks.c
+index 709481d..cfdcefa 100644
+--- a/src/callbacks.c
++++ b/src/callbacks.c
+@@ -1440,7 +1440,7 @@ void img_choose_slideshow_filename(GtkWidget *widget, img_window_struct *img)
+ 
+         /* Filter .img files */
+         project_filter = gtk_file_filter_new ();
+-        gtk_file_filter_set_name(project_filter, _("Imagination projects"));
++        gtk_file_filter_set_name(project_filter, _("Imagination projects (*.img)"));
+         gtk_file_filter_add_pattern(project_filter, "*.img");
+         gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(fc), project_filter);
+ 
+@@ -1450,9 +1450,10 @@ void img_choose_slideshow_filename(GtkWidget *widget, img_window_struct *img)
+         gtk_file_filter_add_pattern(all_files_filter, "*");
+         gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(fc), all_files_filter);
+ 
+-        if (widget == img->save_as_menu || (widget == img->save_menu && img->project_filename == NULL))
++        /* if we are saving, propose a default filename */
++        if (action == GTK_FILE_CHOOSER_ACTION_SAVE)
+             gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER (fc), "unknown.img");
+-        
++
+         if (img->project_current_dir)
+             gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(fc),img->project_current_dir);
+ 
+diff --git a/src/export.c b/src/export.c
+index bf00eeb..292a044 100644
+--- a/src/export.c
++++ b/src/export.c
+@@ -2,7 +2,7 @@
+ ** Copyright (c) 2009 Giuseppe Torelli <colossus73@gmail.com>
+ ** Copyright (C) 2009 Tadej Borovšak   <tadeboro@gmail.com>
+ ** Copyright (c) 2011 Robert Chéramy   <robert@cheramy.net>
+-**  
++**
+ ** This program is free software; you can redistribute it and/or modify
+ ** it under the terms of the GNU General Public License as published by
+ ** the Free Software Foundation; either version 2 of the License, or
+@@ -25,6 +25,7 @@
+ #include "img_sox.h"
+ #include <fcntl.h>
+ #include <glib/gstdio.h>
++#include "video_formats.h"
+ 
+ static GtkWidget *
+ img_create_export_dialog( img_window_struct  *img,
+@@ -59,13 +60,6 @@ static void
+ img_export_frame_to_ppm( cairo_surface_t *surface,
+ 						 gint             file_desc );
+ 
+-static void
+-img_exporter_ogv( img_window_struct *img );
+-static void
+-img_exporter_flv( img_window_struct *img );
+-static void
+-img_exporter_3gp( img_window_struct *img );
+-
+ /*
+  * img_create_export_dialog:
+  * @title: title to display with dialog
+@@ -255,8 +249,8 @@ img_prepare_audio( img_window_struct *img )
+ 
+ 		/* Spawn sox thread now. */
+ 		g_atomic_int_set( &img->sox_flags, 0 );
+-		img->sox = g_thread_create( (GThreadFunc)img_produce_audio_data,
+-									tdata, TRUE, NULL );
++		img->sox = g_thread_new( "Imagination" , (GThreadFunc)img_produce_audio_data,
++									tdata);
+ 
+ 		/* Chain last export step - video export */
+ 		g_idle_add( (GSourceFunc)img_start_export, img );
+@@ -453,11 +447,11 @@ img_stop_export( img_window_struct *img )
+ 	/* Do any additional tasks */
+ 	if( img->export_is_running > 3 )
+ 	{
+-		kill( img->ffmpeg_export, SIGINT );
++		kill( img->encoder_pid, SIGINT );
+ 		g_source_remove( img->source_id );
+ 
+ 		close(img->file_desc);
+-		g_spawn_close_pid( img->ffmpeg_export );
++		g_spawn_close_pid( img->encoder_pid );
+ 
+ 		/* Destroy images that were used */
+ 		cairo_surface_destroy( img->image1 );
+@@ -647,7 +641,7 @@ img_run_encoder( img_window_struct *img )
+ 
+ 	ret = g_spawn_async_with_pipes( NULL, argv, NULL,
+ 									G_SPAWN_SEARCH_PATH,
+-									NULL, NULL, &img->ffmpeg_export,
++									NULL, NULL, &img->encoder_pid,
+ 									&img->file_desc,
+                                     NULL,               /* print to standard_output */
+                                     NULL,               /* print to standard_error */
+@@ -1131,20 +1125,19 @@ img_export_frame_to_ppm( cairo_surface_t *surface,
+ }
+ 
+ /* ****************************************************************************
+- * Exporter functions
++ * Exporter function
+  *
+- * These are the functions that will be called when user selects export format.
++ * This is the function that will be called when user selects export format.
+  *
+- * There is exactly one function per export format. Addresses of these functions
+- * are stored inside Exporter structs, which can be obtained by calling
+- * img_get_exporters function.
++ * There is one function for all formats, data is stored in video_format_list
++ * (new_slideshow.c). If you wish to add a new format, have a look at 
++ * video_format_list.
+  *
+- * Each exporter function receives pointer to main img_window_struct structure,
++ * The exporter function receives a pointer to main img_window_struct structure,
+  * from which it calculates appropriate ffmpeg export string.
+  *
+  * Structure, passed in as a parameter, should be treated like read-only
+- * information source. Exceptions to this rule are export_fps and
+- * export_cmd_line fields. Those fields MUST be set to appropriate value.
++ * information source. Exceptions to this rule is the export_cmd_line field.
+  *
+  * For example, if we spawn ffmpeg with "-r 25" in it's cmd line, export_fps
+  * should be set to 25. This will ensure that ffmpeg will receive proper amount
+@@ -1156,31 +1149,19 @@ img_export_frame_to_ppm( cairo_surface_t *surface,
+  * path to newly produced audio file (at this stage, we don't have any).
+  * ************************************************************************* */
+ 
+-void img_exporter_vob( img_window_struct *img )
++void img_exporter (GtkWidget *button, img_window_struct *img )
+ {
+-	gchar          *cmd_line;
+-	gchar          *format;
++	gchar          *cmd_line, *bitrate_cmd, *aspect_ratio_cmd;
+ 	const gchar    *filename;
+-	gchar          *aspect_ratio, *aspect_ratio_cmd;
+ 	GtkWidget      *dialog;
+ 	GtkEntry       *entry;
+ 	GtkWidget      *vbox;
+ 
+-	/* Additional options - VOB only */
+-	GtkWidget *frame;
+-	GtkWidget *label;
+-	GtkWidget *hbox;
+-	GtkWidget *radio1, *radio2;
+-    
+-    /* ffmpeg test */
+-    gchar *ffmpeg_test_result;
+-    gchar **argv;
+-    gint    argc;
+-
+ 	/* This function call should be the first thing exporter does, since this
+ 	 * function will take some preventive measures and also switches mode into
+ 	 * preview if needed. */
+-	dialog = img_create_export_dialog( img, _("VOB (DVD video)"),
++    /* FIXME: change with a gtk_file_chooser ? */
++	dialog = img_create_export_dialog( img, _(video_format_list[img->video_format_index].name),
+ 									   GTK_WINDOW( img->imagination_window ),
+ 									   &entry, &vbox );
+ 
+@@ -1188,625 +1169,100 @@ void img_exporter_vob( img_window_struct *img )
+ 	if( dialog == NULL )
+ 		return;
+ 
+-	/* Add any export format specific GUI elements here */
+-	frame = gtk_frame_new( NULL );
+-	gtk_box_pack_start( GTK_BOX( vbox ), frame, FALSE, FALSE, 0 );
+-
+-	label = gtk_label_new( _("<b>Television Format</b>") );
+-	gtk_label_set_use_markup( GTK_LABEL( label ), TRUE );
+-	gtk_frame_set_label_widget( GTK_FRAME( frame ), label );
+-
+-	hbox = gtk_hbox_new( TRUE, 5 );
+-	gtk_container_add( GTK_CONTAINER( frame ), hbox );
+-
+-	radio1 = gtk_radio_button_new_with_mnemonic( NULL, _("Normal 4:3") );
+-	gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( radio1 ), TRUE );
+-	gtk_box_pack_start( GTK_BOX( hbox ), radio1, FALSE, FALSE, 0 );
++	gtk_widget_show_all (dialog );
+ 
+-	radio2 = gtk_radio_button_new_with_mnemonic_from_widget(
+-				GTK_RADIO_BUTTON( radio1 ), _("Widescreen 16:9") );
+-	gtk_box_pack_start( GTK_BOX( hbox ), radio2, FALSE, FALSE, 0 );
+-
+-	gtk_widget_show_all( dialog );
+-
+-	/* Run dialog and abort if needed */
+-	if( gtk_dialog_run( GTK_DIALOG( dialog ) ) != GTK_RESPONSE_ACCEPT )
++    /* Run dialog and abort if needed */
++	if ( gtk_dialog_run( GTK_DIALOG( dialog ) ) != GTK_RESPONSE_ACCEPT )
+ 	{
+ 		gtk_widget_destroy( dialog );
+ 		return;
+ 	}
+ 
+-	/* User is serious, so we better prepare ffmepg command line;) */
+-	img->export_is_running = 1;
+-    if (img->video_size[1] == 576)
+-    {
+-        format = "pal";
+-        img->export_fps = 25;
+-    }
+-    else
++    if (gtk_entry_get_text_length (entry) == 0) /* No filename given */
+     {
+-        format = "ntsc";
+-        img->export_fps = 30;
++        gtk_widget_destroy( dialog );
++        return;
+     }
+-	filename = gtk_entry_get_text( entry );
+-	if( gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( radio1 ) ) )
+-		aspect_ratio = "4:3";
+-	else
+-		aspect_ratio = "16:9";
+ 
++    filename = gtk_entry_get_text( entry );
+ 
+-    /* Check if ffmpeg is compiled with avfilter setdar */
+-    img_message(img, FALSE, "Testing ffmpeg abilities with \"ffmpeg -filters\" ... ");
++	/* User is serious, so we better prepare ffmepg command line;) */
++	img->export_is_running = 1;
+ 
+-    g_shell_parse_argv("ffmpeg -filters", &argc, &argv, NULL);
+-    g_spawn_sync(NULL, argv, NULL,
+-                 G_SPAWN_STDERR_TO_DEV_NULL|G_SPAWN_SEARCH_PATH,
+-                 NULL, NULL,
+-                 &ffmpeg_test_result, NULL,
+-                 NULL, NULL);
+-    if (NULL != ffmpeg_test_result && NULL != g_strrstr(ffmpeg_test_result, "setdar"))
+-    {
+-        img_message(img, FALSE, "setdar found!\n");
+-        aspect_ratio_cmd = "-vf setdar=";
+-    }
++    if (NULL != video_format_list[img->video_format_index].aspect_ratio_list)
++        aspect_ratio_cmd = g_strdup_printf("%s%s",
++                    img->ffmpeg_aspect_ratio_cmd,
++                    video_format_list[img->video_format_index].aspect_ratio_list[img->aspect_ratio_index].ffmpeg_option);
+     else
+-    {
+-        img_message(img, FALSE, "setdar not found!\n");
+-        aspect_ratio_cmd = "-aspect ";
+-
+-    }
+-    g_strfreev( argv );
++        aspect_ratio_cmd = g_strdup("");
+ 
+-	cmd_line = g_strdup_printf( "ffmpeg -f image2pipe -vcodec ppm -r %.0f "
+-								"-i pipe: <#AUDIO#> -y "
+-								"-bf 2 -target %s-dvd -s %dx%d %s%s \"%s\"",
+-								img->export_fps,
+-								format,
+-                                img->video_size[0], img->video_size[1],
+-                                aspect_ratio_cmd, aspect_ratio, filename );
++    if (NULL != video_format_list[img->video_format_index].bitratelist)
++        bitrate_cmd = g_strdup_printf("-b %d",
++                    video_format_list[img->video_format_index].bitratelist[img->bitrate_index].value);
++    else
++        bitrate_cmd = g_strdup("");
++
++
++	cmd_line = g_strdup_printf("%s -f image2pipe -vcodec ppm "
++                "-r %s "                /* frame rate */
++                "-i pipe: <#AUDIO#> "
++                "-y "                   /* overwrite output */
++                "%s "                   /* ffmpeg option */
++                "-s %dx%d "             /* size */
++                "%s "                   /* aspect ratio */
++                "%s "                   /* Bitrate */
++                "\"%s\"",               /*filename */
++                img->encoder_name,
++                video_format_list[img->video_format_index].fps_list[img->fps_index].ffmpeg_option,
++                video_format_list[img->video_format_index].ffmpeg_option,
++                img->video_size[0], img->video_size[1],
++                aspect_ratio_cmd,
++                bitrate_cmd,
++                filename);
+ 	img->export_cmd_line = cmd_line;
+ 
+ 	/* Initiate stage 2 of export - audio processing */
+ 	g_idle_add( (GSourceFunc)img_prepare_audio, img );
+ 
++    g_free(aspect_ratio_cmd);
++    g_free(bitrate_cmd);
+ 	gtk_widget_destroy( dialog );
+ }
+ 
+-static void
+-img_exporter_ogv( img_window_struct *img )
+-{
+-	gchar          *cmd_line;
+-	const gchar    *filename;
+-	gchar          *aspect_ratio;
+-	GtkWidget      *dialog;
+-	GtkEntry       *entry;
+-	GtkWidget      *vbox;
+-
+-	/* Additional options - OGG  only */
+-	GtkWidget *frame, *alignment, *label;
+-	GtkWidget *hbox, *vbox_normal;
+-	GtkWidget *radio1, *radio2;
+-	GtkWidget *video_size_combo;
+-	GtkWidget *radios[3];
+-	gint	  i, width, height;
+-
+-	/* These values have been contributed by Jean-Pierre Redonnet.
+-	 * Thanks. */
+-	gint       qualities[] = { 512, 1024, 2048 };
+-
+-	/* This function call should be the first thing exporter does, since this
+-	 * function will take some preventive measures. */
+-	dialog = img_create_export_dialog( img, _("OGV (Theora/Vorbis)"),
+-									   GTK_WINDOW( img->imagination_window ),
+-									   &entry, &vbox );
+-
+-	/* If dialog is NULL, abort. */
+-	if( dialog == NULL )
+-		return;
+-
+-	/* Add any export format specific GUI elements here */
+-	hbox = gtk_hbox_new( TRUE, 10 );
+-	gtk_box_pack_start( GTK_BOX( vbox ), hbox, FALSE, FALSE, 0 );
+-
+-	/* Aspect Ratio */
+-	frame = gtk_frame_new( NULL );
+-	gtk_box_pack_start( GTK_BOX( hbox ), frame, TRUE, TRUE, 0 );
+-
+-	label = gtk_label_new( _("<b>Aspect Ratio</b>") );
+-	gtk_label_set_use_markup( GTK_LABEL( label ), TRUE );
+-	gtk_frame_set_label_widget( GTK_FRAME( frame ), label );
+-
+-	alignment = gtk_alignment_new(0.5, 0.5, 0.5, 0.5);
+-	gtk_container_add (GTK_CONTAINER (frame), alignment);
+-	gtk_alignment_set_padding (GTK_ALIGNMENT (alignment), 0, 0, 5, 5);
+-
+-	vbox_normal = gtk_vbox_new( FALSE, 0 );
+-	gtk_container_add( GTK_CONTAINER( alignment ), vbox_normal );
+-
+-	radio1 = gtk_radio_button_new_with_mnemonic( NULL, _("Normal 4:3") );
+-	gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( radio1 ), TRUE );
+-	gtk_box_pack_start( GTK_BOX( vbox_normal ), radio1, FALSE, FALSE, 0 );
+-
+-	radio2 = gtk_radio_button_new_with_mnemonic_from_widget(GTK_RADIO_BUTTON( radio1 ), _("Widescreen 16:9") );
+-	gtk_box_pack_start( GTK_BOX( vbox_normal ), radio2, FALSE, FALSE, 0 );
+ 
+-	/* Video Size */
+-	frame = gtk_frame_new( NULL );
+-	gtk_box_pack_start( GTK_BOX( hbox ), frame, TRUE, TRUE, 0 );
+-
+-	label = gtk_label_new( _("<b>Video Size</b>") );
+-	gtk_label_set_use_markup( GTK_LABEL( label ), TRUE );
+-	gtk_frame_set_label_widget( GTK_FRAME( frame ), label );
+-
+-	alignment = gtk_alignment_new(0.5, 0.5, 0.5, 0.5);
+-	gtk_container_add (GTK_CONTAINER (frame), alignment);
+-	gtk_alignment_set_padding (GTK_ALIGNMENT (alignment), 0, 0, 5, 5);
+-
+-	vbox_normal = gtk_vbox_new( FALSE, 0 );
+-	gtk_container_add (GTK_CONTAINER (alignment), vbox_normal);
+-
+-	video_size_combo = _gtk_combo_box_new_text(FALSE);
+-	gtk_box_pack_start( GTK_BOX( vbox_normal ), video_size_combo, FALSE, FALSE, 0 );
+-	{
+-		GtkTreeIter   iter;
+-		GtkListStore *store = GTK_LIST_STORE( gtk_combo_box_get_model(GTK_COMBO_BOX( video_size_combo ) ) );
+-
+-		gtk_list_store_append( store, &iter );
+-		gtk_list_store_set( store, &iter, 0, "320 x 240", -1 );
+-		gtk_list_store_append( store, &iter );
+-		gtk_list_store_set( store, &iter, 0, "352 x 288", -1 );
+-		gtk_list_store_append( store, &iter );
+-		gtk_list_store_set( store, &iter, 0, "400 x 300", -1 );
+-		gtk_list_store_append( store, &iter );
+-		gtk_list_store_set( store, &iter, 0, "512 x 384", -1 );
+-		gtk_list_store_append( store, &iter );
+-		gtk_list_store_set( store, &iter, 0, "640 x 480", -1 );
+-		gtk_list_store_append( store, &iter );
+-		gtk_list_store_set( store, &iter, 0, "704 x 576", -1 );
+-	}
+-	gtk_combo_box_set_active( GTK_COMBO_BOX( video_size_combo ), 0 );
+-
+-	/* Video Quality */
+-	frame = gtk_frame_new( NULL );
+-	gtk_box_pack_start( GTK_BOX( vbox ), frame, FALSE, FALSE, 0 );
+-
+-	label = gtk_label_new( _("<b>Video Quality:</b>") );
+-	gtk_label_set_use_markup( GTK_LABEL( label ), TRUE );
+-	gtk_frame_set_label_widget( GTK_FRAME( frame ), label );
+-
+-	hbox = gtk_hbox_new( TRUE, 5 );
+-	gtk_container_add( GTK_CONTAINER( frame ), hbox );
+-
+-	radios[0] = gtk_radio_button_new_with_mnemonic( NULL, _("Low") );
+-	gtk_box_pack_start( GTK_BOX( hbox ), radios[0], FALSE, FALSE, 0 );
+-
+-	radios[1] = gtk_radio_button_new_with_mnemonic_from_widget(
+-				GTK_RADIO_BUTTON( radios[0] ), _("Medium") );
+-	gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( radios[1] ), TRUE );
+-	gtk_box_pack_start( GTK_BOX( hbox ), radios[1], FALSE, FALSE, 0 );
+-
+-	radios[2] = gtk_radio_button_new_with_mnemonic_from_widget(
+-				GTK_RADIO_BUTTON( radios[0] ), _("High") );
+-	gtk_box_pack_start( GTK_BOX( hbox ), radios[2], FALSE, FALSE, 0 );
+-
+-	gtk_widget_show_all( dialog );
+-
+-	/* Run dialog and abort if needed */
+-	if( gtk_dialog_run( GTK_DIALOG( dialog ) ) != GTK_RESPONSE_ACCEPT )
+-	{
+-		gtk_widget_destroy( dialog );
+-		return;
+-	}
+-
+-	/* User is serious, so we better prepare ffmpeg command line;) */
+-	img->export_is_running = 1;
+-	img->export_fps = 30;
+-	filename = gtk_entry_get_text( entry );
+-
+-	/* Any additional calculation can be placed here. */
+-	switch(gtk_combo_box_get_active(GTK_COMBO_BOX(video_size_combo)) )
+-	{
+-		case 0:
+-		width  = 320;
+-		height = 240;
+-		break;
+-		
+-		case 1:
+-		width  = 352;
+-		height = 288;
+-		break;
+-
+-		case 2:
+-		width  = 400;
+-		height = 300;
+-		break;
+-
+-		case 3:
+-		width  = 512;
+-		height = 384;
+-		break;
+-
+-		case 4:
+-		width  = 640;
+-		height = 480;
+-		break;
+-
+-		case 5:
+-		width  = 704;
+-		height = 576;
+-		break;
+-	}
+-
+-	if( gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( radio1 ) ) )
+-		aspect_ratio = "4:3";
+-	else
+-		aspect_ratio = "16:9";
+-
+-	for( i = 0; i < 3; i++ )
+-	{
+-		if( gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( radios[i] ) ) )
+-			break;
+-	}
+-
+-	cmd_line = g_strdup_printf( "ffmpeg -f image2pipe -vcodec ppm -r %.0f "
+-								"-i pipe: <#AUDIO#> -f ogg -aspect %s -s %dx%d "
+-								"-vcodec libtheora -b %dk -acodec libvorbis "
+-								"-y \"%s\"",
+-								img->export_fps, aspect_ratio, width, height,
+-								qualities[i], filename );
+-	img->export_cmd_line = cmd_line;
+-
+-	/* Initiate stage 2 of export - audio processing */
+-	g_idle_add( (GSourceFunc)img_prepare_audio, img );
+-
+-	gtk_widget_destroy( dialog );
+-}
+-
+-static void
+-img_exporter_flv( img_window_struct *img )
++/* Test ffmpeg abilities */
++void test_ffmpeg(img_window_struct *img)
+ {
+-	gchar          *cmd_line;
+-	const gchar    *filename;
+-	GtkWidget      *dialog;
+-	GtkEntry       *entry;
+-	GtkWidget      *vbox;
+-
+-	/* Additional options - FLV  only */
+-	GtkWidget *frame;
+-	GtkWidget *label;
+-	GtkWidget *hbox, *vbox_normal, *alignment;
+-	GtkWidget *radio1, *radio2;
+-	GtkWidget *video_size_combo;
+-	GtkWidget *radios[3];
+-	gint       i, width, height;
+-	gint       qualities[] = { 384, 768, 1536 };
+-
+-	/* This function call should be the first thing exporter does, since this
+-	 * function will take some preventive measures. */
+-	dialog = img_create_export_dialog( img, _("FLV (Flash video)"),
+-									   GTK_WINDOW( img->imagination_window ),
+-									   &entry, &vbox );
+-
+-	/* If dialog is NULL, abort. */
+-	if( dialog == NULL )
+-		return;
+-
+-	/* Add any export format specific GUI elements here */
+-	hbox = gtk_hbox_new( TRUE, 10 );
+-	gtk_box_pack_start( GTK_BOX( vbox ), hbox, FALSE, FALSE, 0 );
+-
+-	/* Aspect Ratio */
+-	frame = gtk_frame_new( NULL );
+-	gtk_box_pack_start( GTK_BOX( hbox ), frame, TRUE, TRUE, 0 );
+-
+-	label = gtk_label_new( _("<b>Aspect Ratio</b>") );
+-	gtk_label_set_use_markup( GTK_LABEL( label ), TRUE );
+-	gtk_frame_set_label_widget( GTK_FRAME( frame ), label );
+-
+-	alignment = gtk_alignment_new(0.5, 0.5, 0.5, 0.5);
+-	gtk_container_add (GTK_CONTAINER (frame), alignment);
+-	gtk_alignment_set_padding (GTK_ALIGNMENT (alignment), 0, 0, 5, 5);
+-
+-	vbox_normal = gtk_vbox_new( FALSE, 0 );
+-	gtk_container_add( GTK_CONTAINER( alignment ), vbox_normal );
+-
+-	radio1 = gtk_radio_button_new_with_mnemonic( NULL, _("Normal 4:3") );
+-	gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( radio1 ), TRUE );
+-	gtk_box_pack_start( GTK_BOX( vbox_normal ), radio1, FALSE, FALSE, 0 );
+-
+-	radio2 = gtk_radio_button_new_with_mnemonic_from_widget(GTK_RADIO_BUTTON( radio1 ), _("Widescreen 16:9") );
+-	gtk_box_pack_start( GTK_BOX( vbox_normal ), radio2, FALSE, FALSE, 0 );
+-
+-	/* Video Size */
+-	frame = gtk_frame_new( NULL );
+-	gtk_box_pack_start( GTK_BOX( hbox ), frame, TRUE, TRUE, 0 );
+-
+-	label = gtk_label_new( _("<b>Video Size</b>") );
+-	gtk_label_set_use_markup( GTK_LABEL( label ), TRUE );
+-	gtk_frame_set_label_widget( GTK_FRAME( frame ), label );
+-
+-	alignment = gtk_alignment_new(0.5, 0.5, 0.5, 0.5);
+-	gtk_container_add (GTK_CONTAINER (frame), alignment);
+-	gtk_alignment_set_padding (GTK_ALIGNMENT (alignment), 0, 0, 5, 5);
+-
+-	vbox_normal = gtk_vbox_new( FALSE, 0 );
+-	gtk_container_add (GTK_CONTAINER (alignment), vbox_normal);
+-
+-	video_size_combo = _gtk_combo_box_new_text(FALSE);
+-	gtk_box_pack_start( GTK_BOX( vbox_normal ), video_size_combo, FALSE, FALSE, 0 );
+-	{
+-		GtkTreeIter   iter;
+-		GtkListStore *store = GTK_LIST_STORE( gtk_combo_box_get_model(GTK_COMBO_BOX( video_size_combo ) ) );
+-
+-		gtk_list_store_append( store, &iter );
+-		gtk_list_store_set( store, &iter, 0, "320 x 240", -1 );
+-		gtk_list_store_append( store, &iter );
+-		gtk_list_store_set( store, &iter, 0, "352 x 288", -1 );
+-		gtk_list_store_append( store, &iter );
+-		gtk_list_store_set( store, &iter, 0, "400 x 300", -1 );
+-		gtk_list_store_append( store, &iter );
+-		gtk_list_store_set( store, &iter, 0, "512 x 384", -1 );
+-		gtk_list_store_append( store, &iter );
+-		gtk_list_store_set( store, &iter, 0, "640 x 360", -1 );
+-	}
+-	gtk_combo_box_set_active( GTK_COMBO_BOX( video_size_combo ), 0 );
+-
+-	frame = gtk_frame_new( NULL );
+-	gtk_box_pack_start( GTK_BOX( vbox ), frame, FALSE, FALSE, 0 );
+-
+-	label = gtk_label_new( _("<b>Video Quality:</b>") );
+-	gtk_label_set_use_markup( GTK_LABEL( label ), TRUE );
+-	gtk_frame_set_label_widget( GTK_FRAME( frame ), label );
+-
+-	hbox = gtk_hbox_new( TRUE, 5 );
+-	gtk_container_add( GTK_CONTAINER( frame ), hbox );
+-
+-	radios[0] = gtk_radio_button_new_with_mnemonic( NULL, _("Low") );
+-	gtk_box_pack_start( GTK_BOX( hbox ), radios[0], FALSE, FALSE, 0 );
+-
+-	radios[1] = gtk_radio_button_new_with_mnemonic_from_widget(
+-				GTK_RADIO_BUTTON( radios[0] ), _("Medium") );
+-	gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( radios[1] ), TRUE );
+-	gtk_box_pack_start( GTK_BOX( hbox ), radios[1], FALSE, FALSE, 0 );
+-
+-	radios[2] = gtk_radio_button_new_with_mnemonic_from_widget(
+-				GTK_RADIO_BUTTON( radios[0] ), _("High") );
+-	gtk_box_pack_start( GTK_BOX( hbox ), radios[2], FALSE, FALSE, 0 );
+-
+-	gtk_widget_show_all( dialog );
+-
+-	/* Run dialog and abort if needed */
+-	if( gtk_dialog_run( GTK_DIALOG( dialog ) ) != GTK_RESPONSE_ACCEPT )
+-	{
+-		gtk_widget_destroy( dialog );
+-		return;
+-	}
+-
+-	/* User is serious, so we better prepare ffmpeg command line;) */
+-	img->export_is_running = 1;
+-	img->export_fps = 30;
+-	filename = gtk_entry_get_text( entry );
+-
+-	/* The -aspect parameter for FLV format seems to be ignored by ffmpeg */
+-	if( gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( radio1 ) ) )
+-	{
+-		switch(gtk_combo_box_get_active(GTK_COMBO_BOX(video_size_combo)) )
+-		{
+-			case 0:
+-			width  = 320;
+-			height = 240;
+-			break;
+-		
+-			case 1:
+-			width  = 352;
+-			height = 288;
+-			break;
+-
+-			case 2:
+-			width  = 400;
+-			height = 300;
+-			break;
+-
+-			case 3:
+-			width  = 512;
+-			height = 384;
+-			break;
+-
+-			case 4:
+-			width  = 640;
+-			height = 480;
+-			break;
+-		}
+-	}
+-	else
+-	{
+-		switch(gtk_combo_box_get_active(GTK_COMBO_BOX(video_size_combo)) )
+-		{
+-			case 0:
+-			width  = 426;
+-			height = 240;
+-			break;
+-		
+-			case 1:
+-			width  = 512;
+-			height = 288;
+-			break;
+-
+-			case 2:
+-			width  = 534;
+-			height = 300;
+-			break;
+-
+-			case 3:
+-			width  = 682;
+-			height = 384;
+-			break;
+-
+-			case 4:
+-			width  = 640;
+-			height = 360;
+-			break;
+-		}
+-	}
+-
+-	for( i = 0; i < 3; i++ )
+-	{
+-		if( gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( radios[i] ) ) )
+-			break;
+-	}
+-
+-	cmd_line = g_strdup_printf( "ffmpeg -f image2pipe -vcodec ppm -r %.0f "
+-								"-i pipe: <#AUDIO#> -f flv -s %dx%d "
+-								"-vcodec flv -b %dk -acodec libmp3lame -ab 56000 "
+-								"-ar 22050 -ac 1 -y \"%s\"",
+-								img->export_fps, width, height,
+-								qualities[i], filename );
+-	img->export_cmd_line = cmd_line;
+-
+-	/* Initiate stage 2 of export - audio processing */
+-	g_idle_add( (GSourceFunc)img_prepare_audio, img );
+-
+-	gtk_widget_destroy( dialog );
+-}
+-
+-static void
+-img_exporter_3gp( img_window_struct *img )
+-{
+-	gchar          *cmd_line;
+-	const gchar    *filename;
+-	GtkWidget      *dialog;
+-	GtkEntry       *entry;
+-	GtkWidget      *vbox;
+-
+-	/* Additional options - 3GP  only */
+-	GtkWidget *frame1, *alignment;
+-	GtkWidget *label;
+-	GtkWidget *hbox, *vbox_normal;
+-	GtkWidget *normal_combo;
+-	gint       width, height;
+-
+-	/* This function call should be the first thing exporter does, since this
+-	 * function will take some preventive measures. */
+-	dialog = img_create_export_dialog( img, _("3GP (Mobile Phones)"),
+-									   GTK_WINDOW( img->imagination_window ),
+-									   &entry, &vbox );
+-
+-	/* If dialog is NULL, abort. */
+-	if( dialog == NULL )
+-		return;
+-
+-	/* Add any export format specific GUI elements here */
+-	hbox = gtk_hbox_new( TRUE, 5 );
+-	gtk_container_add( GTK_CONTAINER( vbox ), hbox );
+-	
+-	frame1 = gtk_frame_new( NULL );
+-	gtk_box_pack_start( GTK_BOX( hbox ), frame1, FALSE, TRUE, 0 );
+-
+-	label = gtk_label_new( _("<b>Video Size</b>") );
+-	gtk_label_set_use_markup( GTK_LABEL( label ), TRUE );
+-	gtk_frame_set_label_widget( GTK_FRAME( frame1 ), label );
+-
+-	alignment = gtk_alignment_new(0, 0, 0.5, 0.5);
+-	gtk_container_add (GTK_CONTAINER (frame1), alignment);
+-	gtk_alignment_set_padding (GTK_ALIGNMENT (alignment), 5, 5, 5, 5);
+-
+-	vbox_normal = gtk_vbox_new( FALSE, 0 );
+-	gtk_container_add (GTK_CONTAINER (alignment), vbox_normal);
+-
+-	normal_combo = _gtk_combo_box_new_text(FALSE);
+-	gtk_box_pack_start( GTK_BOX( vbox_normal ), normal_combo, FALSE, FALSE, 0 );
+-	{
+-		GtkTreeIter   iter;
+-		GtkListStore *store = GTK_LIST_STORE( gtk_combo_box_get_model(GTK_COMBO_BOX( normal_combo ) ) );
+-
+-		gtk_list_store_append( store, &iter );
+-		gtk_list_store_set( store, &iter, 0, "128 x 96", -1 );
+-		gtk_list_store_append( store, &iter );
+-		gtk_list_store_set( store, &iter, 0, "176 x 144", -1 );
+-		gtk_list_store_append( store, &iter );
+-		gtk_list_store_set( store, &iter, 0, "352 x 288", -1 );
+-		gtk_list_store_append( store, &iter );
+-		gtk_list_store_set( store, &iter, 0, "704 x 576", -1 );
+-	}
+-	gtk_combo_box_set_active( GTK_COMBO_BOX( normal_combo ), 0 );
+-	gtk_widget_show_all( dialog );
+-
+-	/* Run dialog and abort if needed */
+-	if( gtk_dialog_run( GTK_DIALOG( dialog ) ) != GTK_RESPONSE_ACCEPT )
+-	{
+-		gtk_widget_destroy( dialog );
+-		return;
+-	}
+-
+-	/* User is serious, so we better prepare ffmpeg command line;) */
+-	img->export_is_running = 1;
+-	img->export_fps = 25;
+-	filename = gtk_entry_get_text( entry );
++    /* ffmpeg test */
++    gchar *ffmpeg_test_result;
++    gchar **argv;
++    gint    argc;
+ 
+-	/* Any additional calculation can be placed here. */
+-	switch(gtk_combo_box_get_active(GTK_COMBO_BOX(normal_combo)) )
+-	{
+-		case 0:
+-		width  = 128;
+-		height = 96;
+-		break;
+-
+-		case 1:
+-		width  = 176;
+-		height = 144;
+-		break;
+-
+-		case 2:
+-		width  = 352;
+-		height = 288;
+-		break;
+-
+-		case 3:
+-		width  = 704;
+-		height = 576;
+-		break;
+-	}
++   /* Check if ffmpeg/avconv is compiled with avfilter setdar */
++    img_message(img, FALSE, (g_strrstr(img->encoder_name, "ffmpeg") ? "Testing ffmpeg abilities with \"ffmpeg -filters\" ... "
++    															   : "Testing avconv abilities with \"avconv -filters\" ... "));
+ 
+-	cmd_line = g_strdup_printf( "ffmpeg -f image2pipe -vcodec ppm -r %.0f "
+-								"-i pipe: <#AUDIO#> -f 3gp -s %dx%d "
+-								"-vcodec h263 -acodec libfaac -b 192k -ab 32k "
+-								"-ar 8000 -ac 1 -y \"%s\"",
+-								img->export_fps,
+-								width, height, filename );
+-	img->export_cmd_line = cmd_line;
++    if (g_strrstr(img->encoder_name, "ffmpeg"))
++    	g_shell_parse_argv("ffmpeg -filters", &argc, &argv, NULL);
++    else
++    	g_shell_parse_argv("avconv -filters", &argc, &argv, NULL);
+ 
+-	/* Initiate stage 2 of export - audio processing */
+-	g_idle_add( (GSourceFunc)img_prepare_audio, img );
++    g_spawn_sync(NULL, argv, NULL,
++                 G_SPAWN_STDERR_TO_DEV_NULL|G_SPAWN_SEARCH_PATH,
++                 NULL, NULL,
++                 &ffmpeg_test_result, NULL,
++                 NULL, NULL);
++    if (NULL != ffmpeg_test_result && NULL != g_strrstr(ffmpeg_test_result, "setdar"))
++    {
++        img_message(img, FALSE, "setdar found!\n");
++        img->ffmpeg_aspect_ratio_cmd = "-vf setdar=";
++    }
++    else
++    {
++        img_message(img, FALSE, "setdar not found!\n");
++        img->ffmpeg_aspect_ratio_cmd = "-aspect ";
+ 
+-	gtk_widget_destroy( dialog );
+-}
+-/* ****************************************************************************
+- * End exporters
+- * ************************************************************************* */
++    }
++    g_strfreev( argv );
+ 
+-void img_choose_exporter(GtkWidget *button, img_window_struct *img)
+-{
+-	switch (img->video_format)
+-	{
+-		default:
+-		case 'V':
+-		img_exporter_vob(img);
+-		break;
+-
+-		case 'O':
+-		img_exporter_ogv(img);
+-		break;
+-
+-		case 'F':
+-		img_exporter_flv(img);
+-		break;
+-
+-		case '3':
+-		img_exporter_3gp(img);
+-		break;
+-
+-		case 'M':
+-		//img_exporter_vob(img);
+-		break;
+-	}
+ }
+diff --git a/src/export.h b/src/export.h
+index 0cb2efe..8d09632 100644
+--- a/src/export.h
++++ b/src/export.h
+@@ -45,6 +45,10 @@ img_render_still_frame( img_window_struct *img,
+ 						gdouble            rate );
+ 
+ void
+-img_choose_exporter(GtkWidget *button, img_window_struct *img);
++img_exporter(GtkWidget *button, img_window_struct *img);
++
++void
++test_ffmpeg(img_window_struct *img);
++
+ 
+ #endif
+diff --git a/src/imagination.c b/src/imagination.c
+index d322215..b4d0800 100644
+--- a/src/imagination.c
++++ b/src/imagination.c
+@@ -27,6 +27,7 @@
+ #include "main-window.h"
+ #include "support.h"
+ #include "callbacks.h"
++#include "export.h"
+ 
+ extern void output_message(unsigned , const char *, const char *, va_list ap);
+ 
+@@ -40,9 +41,6 @@ int main (int argc, char *argv[])
+   		textdomain (GETTEXT_PACKAGE);
+ 	#endif
+ 	
+-	if( ! g_thread_supported() )
+-		g_thread_init( NULL );
+-
+ 	gtk_set_locale ();
+ 	gtk_init (&argc, &argv);
+ 	
+@@ -63,6 +61,8 @@ int main (int argc, char *argv[])
+ 		img_load_slideshow( img_window, argv[1] );
+ 	}
+ 
++    test_ffmpeg(img_window);
++
+ 	gtk_main ();
+ 
+ 	sox_format_quit();
+diff --git a/src/imagination.h b/src/imagination.h
+index a39850d..0a2aa27 100644
+--- a/src/imagination.h
++++ b/src/imagination.h
+@@ -230,8 +230,6 @@ struct _img_window_struct
+   	GtkWidget	*statusbar;
+   	GtkWidget	*progress_bar;
+   	GtkWidget	*image_area;
+-  	GtkWidget	*video_format_combo;
+-  	GtkWidget	*video_size_combo;
+   	guint		context_id;
+   	GtkListStore *thumbnail_model;
+   	gchar		*current_dir;
+@@ -297,10 +295,19 @@ struct _img_window_struct
+ 	gchar       *project_current_dir;
+ 	gboolean	distort_images;
+ 	gboolean	project_is_modified;
+-	gchar		video_format;
++    GtkWidget   *video_format_combo;
++	gint        video_format_index;
++    GtkWidget   *video_size_combo;
+ 	gint        video_size[2];
+ 	gdouble     video_ratio;
+-	gdouble     background_color[3];
++    GtkWidget  *aspect_ratio_combo;
++    gint        aspect_ratio_index;
++    gchar      *ffmpeg_aspect_ratio_cmd;
++    GtkWidget  *fps_combo;
++    gint        fps_index;
++    GtkWidget  *bitrate_combo;
++    gint        bitrate_index;
++    gdouble     background_color[3];
+   	gint		total_secs;
+ 	gint		total_music_secs;
+   	gint		slides_nr;
+@@ -370,10 +377,11 @@ struct _img_window_struct
+ 	GtkWidget   *export_label;
+ 	GtkWidget   *export_dialog;
+ 	gdouble      export_fps;        /* Frame rate for exported video */
++	gchar		*encoder_name;		/* ffmpeg or avconv	*/
+ 	gchar       *export_cmd_line;   /* ffmpeg spawn cmd line */
+ 	guint        export_slide;		/* Number of slide being exported */
+ 	GSourceFunc  export_idle_func;	/* Stored procedure for pause */
+-	GPid         ffmpeg_export;     /* ffmpeg's process id */
++	GPid         encoder_pid;       /* ffmpeg/avconv process id */
+ 
+ 	/* Sox thread related variables */
+ 	gint      sox_flags;         /* Thread controls:
+diff --git a/src/img_sox.c b/src/img_sox.c
+index f8a0a13..622fa42 100644
+--- a/src/img_sox.c
++++ b/src/img_sox.c
+@@ -31,7 +31,7 @@ output_flow( sox_effect_t       *effp,
+ {
+ 	if( ! g_atomic_int_get( global->sox_flags ) )
+ 	{
+-		size_t len = sox_write( global->output, ibuf, *isamp );
++		sox_write( global->output, ibuf, *isamp );
+ 		*osamp = 0;
+ 
+ 		return( SOX_SUCCESS );
+diff --git a/src/main-window.c b/src/main-window.c
+index 2163125..8fdb702 100644
+--- a/src/main-window.c
++++ b/src/main-window.c
+@@ -2,7 +2,7 @@
+  *  Copyright (c) 2009 Giuseppe Torelli <colossus73@gmail.com>
+  *  Copyright (c) 2009 Tadej Borovšak 	<tadeboro@gmail.com>
+  *  Copyright (c) 2011 Robert Chéramy   <robert@cheramy.net>
+- * 
++ *
+  *  This program is free software; you can redistribute it and/or modify
+  *  it under the terms of the GNU General Public License as published by
+  *  the Free Software Foundation; either version 2 of the License,or
+@@ -29,6 +29,7 @@
+ #include "export.h"
+ #include "subtitles.h"
+ #include "imgcellrendererpixbuf.h"
++#include "video_formats.h"
+ 
+ static const GtkTargetEntry drop_targets[] =
+ {
+@@ -193,6 +194,11 @@ img_window_struct *img_create_window (void)
+ 	img_struct->video_size[0] = 720;
+ 	img_struct->video_size[1] = 576;
+ 	img_struct->video_ratio = (gdouble)720 / 576;
++	img_struct->video_format_index = 0; /* VOB is default */
++    img_struct->aspect_ratio_index = 0;
++    img_struct->bitrate_index = 0;
++    img_struct->fps_index = 0;
++    img_struct->export_fps = video_format_list[img_struct->video_format_index].fps_list[img_struct->fps_index].value;
+ 
+ 	img_struct->final_transition.duration = 0;
+ 	img_struct->final_transition.render = NULL;
+@@ -294,7 +300,7 @@ img_window_struct *img_create_window (void)
+ 
+ 	export_menu = gtk_image_menu_item_new_with_mnemonic (_("Export"));
+ 	gtk_container_add (GTK_CONTAINER (menu1), export_menu);
+-	g_signal_connect (G_OBJECT (export_menu),"activate",G_CALLBACK (img_choose_exporter),img_struct);
++	g_signal_connect (G_OBJECT (export_menu),"activate",G_CALLBACK (img_exporter),img_struct);
+ 
+ 	image_menu = img_load_icon ("imagination-generate.png",GTK_ICON_SIZE_MENU);
+ 	gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (export_menu),image_menu);
+@@ -1351,7 +1357,9 @@ img_window_struct *img_create_window (void)
+ 		gtk_check_menu_item_set_active(
+ 				GTK_CHECK_MENU_ITEM( tmp_checks[index] ), TRUE );
+ 	}
+-
++	
++	/* As many distros replaced ffmpeg with avconv let's check for it */
++	img_check_for_encoder(img_struct);
+ 	return img_struct;
+ }
+ 
+diff --git a/src/new_slideshow.c b/src/new_slideshow.c
+index 0de05c8..ab23228 100644
+--- a/src/new_slideshow.c
++++ b/src/new_slideshow.c
+@@ -1,6 +1,7 @@
+ /*
+  *  Copyright (c) 2009 Giuseppe Torelli <colossus73@gmail.com>
+  *  Copyright (c) 2009 Tadej Borovšak 	<tadeboro@gmail.com>
++ *  Copyright (c) 2011 Robert Chéramy   <robert@cheramy.net>
+  * 
+  *  This program is free software; you can redistribute it and/or modify
+  *  it under the terms of the GNU General Public License as published by
+@@ -19,6 +20,7 @@
+  */
+ 
+ #include "new_slideshow.h"
++#include "video_formats.h"
+ 
+ /* ****************************************************************************
+  * Local declarations
+@@ -30,6 +32,7 @@ static void
+ img_update_current_slide( img_window_struct *img );
+ 
+ static void img_video_format_changed (GtkComboBox *combo, img_window_struct *img);
++static void img_video_size_changed (GtkComboBox *combo, img_window_struct *img);
+ 
+ /* ****************************************************************************
+  * Public API
+@@ -42,10 +45,6 @@ void img_new_slideshow_settings_dialog(img_window_struct *img, gboolean flag)
+ 	GtkWidget *main_frame;
+ 	GtkWidget *alignment_main_frame;
+ 	GtkWidget *vbox_frame1;
+-	GtkWidget *hbox_slideshow_options;
+-	GtkWidget *frame1;
+-	GtkWidget *label_frame1;
+-	GtkWidget *alignment_frame1;
+ 	GtkWidget *ex_vbox;
+ 	GtkWidget *ex_hbox;
+ 	GtkWidget *frame3;
+@@ -55,11 +54,13 @@ void img_new_slideshow_settings_dialog(img_window_struct *img, gboolean flag)
+ 	GtkWidget *bg_button;
+ 	GtkWidget *bg_label;
+ 	GdkColor   color;
+-	GtkWidget *hbox_video_format;
+-	GtkWidget *hbox_video_size;
+-	GtkWidget *label1;
++	GtkWidget *label;
+ 	gint       response;
++    gint       i;
+ 	gchar     *string;
++    GtkTreeIter   iter;
++    GtkListStore *store;
++    GtkWidget   *table;
+ 
+ 	/* Display propert title depending on the callback that is calling this function. */
+ 	string = ( flag ? _("Project properties") : _("Create a new slideshow") );
+@@ -82,76 +83,80 @@ void img_new_slideshow_settings_dialog(img_window_struct *img, gboolean flag)
+ 	gtk_box_pack_start (GTK_BOX (vbox1), main_frame, TRUE, TRUE, 0);
+ 	gtk_frame_set_shadow_type (GTK_FRAME (main_frame), GTK_SHADOW_IN);
+ 
+-	label1 = gtk_label_new (_("<b>Slideshow Settings</b>"));
+-	gtk_frame_set_label_widget (GTK_FRAME (main_frame), label1);
+-	gtk_label_set_use_markup (GTK_LABEL (label1), TRUE);
++	label = gtk_label_new (_("<b>Slideshow Settings</b>"));
++	gtk_frame_set_label_widget (GTK_FRAME (main_frame), label);
++	gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
+ 
+ 	alignment_main_frame = gtk_alignment_new (0.5, 0.5, 1, 1);
+ 	gtk_container_add (GTK_CONTAINER (main_frame), alignment_main_frame);
+ 	gtk_alignment_set_padding (GTK_ALIGNMENT (alignment_main_frame), 5, 15, 10, 10);
+ 
+-	vbox_frame1 = gtk_vbox_new( FALSE, 10 );
+-	gtk_container_add( GTK_CONTAINER( alignment_main_frame ), vbox_frame1 );
+-
+-	hbox_slideshow_options = gtk_hbox_new(TRUE, 10);
+-	gtk_box_pack_start(GTK_BOX (vbox_frame1), hbox_slideshow_options, TRUE, TRUE, 10);
+-
+-	/* Video Format */
+-
+-	frame1 = gtk_frame_new (NULL);
+-	gtk_box_pack_start (GTK_BOX (hbox_slideshow_options), frame1, TRUE, TRUE, 0);
+-	gtk_frame_set_shadow_type (GTK_FRAME (frame1), GTK_SHADOW_IN);
+-
+-	alignment_frame1 = gtk_alignment_new (0.5, 0.5, 1, 1);
+-	gtk_container_add (GTK_CONTAINER (frame1), alignment_frame1);
+-	gtk_alignment_set_padding (GTK_ALIGNMENT (alignment_frame1), 5, 5, 5, 5);
+-
+-	hbox_video_format = gtk_hbox_new (FALSE, 0);
+-	gtk_container_add (GTK_CONTAINER (alignment_frame1), hbox_video_format);
+-
+-	img->video_format_combo = _gtk_combo_box_new_text(FALSE);
+-	gtk_box_pack_start( GTK_BOX( hbox_video_format ), img->video_format_combo, FALSE, FALSE, 0 );
+-	{
+-		GtkTreeIter   iter;
+-		GtkListStore *store = GTK_LIST_STORE( gtk_combo_box_get_model(GTK_COMBO_BOX( img->video_format_combo ) ) );
+-		gtk_list_store_append( store, &iter );
+-		gtk_list_store_set( store, &iter, 0, "VOB (DVD Video)", -1 );
+-		gtk_list_store_append( store, &iter );
+-		gtk_list_store_set( store, &iter, 0, "OGV (Theora Vorbis)", -1 );		
+-		gtk_list_store_append( store, &iter );
+-		gtk_list_store_set( store, &iter, 0, "FLV (Flash Video)", -1 );
+-		gtk_list_store_append( store, &iter );
+-		gtk_list_store_set( store, &iter, 0, "3GP (Mobile Phones)", -1 );
+-/* Disable MP4 export or 3.0 release
+-		gtk_list_store_append( store, &iter );
+-		gtk_list_store_set( store, &iter, 0, "MP4 (MPEG-4)", -1 ); */
++    vbox_frame1 = gtk_vbox_new( FALSE, 10 );
++    gtk_container_add( GTK_CONTAINER( alignment_main_frame ), vbox_frame1 );
++
++    table = gtk_table_new(5, 2, FALSE);
++    gtk_box_pack_start(GTK_BOX (vbox_frame1), table, TRUE, TRUE, 10);
++
++    /* Video Format */
++    label = gtk_label_new (_("Video Format:"));
++    gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
++    gtk_table_attach(GTK_TABLE(table), label, 0, 1, 0, 1,
++                              GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL, 2, 2);
++
++    img->video_format_combo = _gtk_combo_box_new_text(FALSE);
++    gtk_table_attach(GTK_TABLE(table), img->video_format_combo, 1, 2, 0, 1,
++                              GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL, 0, 2);
++    store = GTK_LIST_STORE( gtk_combo_box_get_model(GTK_COMBO_BOX( img->video_format_combo ) ) );
++    i = 0;
++    while (video_format_list[i].name != NULL) {
++        gtk_list_store_append( store, &iter );
++        gtk_list_store_set( store, &iter, 0, gettext(video_format_list[i].name), -1 );
++        i++;
+ 	}
+-
+-	label_frame1 = gtk_label_new (_("<b>Video Format</b>"));
+-	gtk_frame_set_label_widget (GTK_FRAME (frame1), label_frame1);
+-	gtk_label_set_use_markup (GTK_LABEL (label_frame1), TRUE);
++    /* Fill combobox depending on selected video format */
++    g_signal_connect (G_OBJECT (img->video_format_combo), "changed", G_CALLBACK (img_video_format_changed),img);
+ 
+ 	/* Video Size */
+-	frame1 = gtk_frame_new (NULL);
+-	gtk_box_pack_start (GTK_BOX (hbox_slideshow_options), frame1, TRUE, TRUE, 0);
+-	gtk_frame_set_shadow_type (GTK_FRAME (frame1), GTK_SHADOW_IN);
+-
+-	alignment_frame1 = gtk_alignment_new (0.5, 0.5, 1, 1);
+-	gtk_container_add (GTK_CONTAINER (frame1), alignment_frame1);
+-	gtk_alignment_set_padding (GTK_ALIGNMENT (alignment_frame1), 5, 5, 5, 5);
+-
+-	hbox_video_size = gtk_hbox_new (FALSE, 0);
+-	gtk_container_add (GTK_CONTAINER (alignment_frame1), hbox_video_size);
+-
+-	img->video_size_combo = _gtk_combo_box_new_text(FALSE);
+-	gtk_box_pack_start( GTK_BOX( hbox_video_size ), img->video_size_combo, FALSE, FALSE, 0 );
+-
+-	g_signal_connect (G_OBJECT (img->video_format_combo), "changed", G_CALLBACK (img_video_format_changed),img);
+-	gtk_combo_box_set_active( GTK_COMBO_BOX( img->video_format_combo ), 0 );
+-
+-	label_frame1 = gtk_label_new (_("<b>Video Size</b>"));
+-	gtk_frame_set_label_widget (GTK_FRAME (frame1), label_frame1);
+-	gtk_label_set_use_markup (GTK_LABEL (label_frame1), TRUE);
++    label = gtk_label_new (_("Video Size:"));
++    gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
++    gtk_table_attach(GTK_TABLE(table), label, 0, 1, 1, 2,
++                              GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL, 2, 2);
++
++    img->video_size_combo = _gtk_combo_box_new_text(FALSE);
++    gtk_table_attach(GTK_TABLE(table), img->video_size_combo, 1, 2, 1, 2,
++                              GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL, 0, 2);
++    /* Preset other parameters depending on selected size */
++    g_signal_connect (G_OBJECT (img->video_size_combo), "changed", G_CALLBACK (img_video_size_changed),img);
++
++    /* FPS */
++    label = gtk_label_new( _("Frames per Second (FPS):") );
++    gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
++    gtk_table_attach(GTK_TABLE(table), label, 0, 1, 2, 3,
++                              GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL, 2, 2);
++
++    img->fps_combo = _gtk_combo_box_new_text(FALSE);
++    gtk_table_attach(GTK_TABLE(table), img->fps_combo, 1, 2, 2, 3,
++                              GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL, 0, 2);
++
++    /* Aspect Ratio */
++    label = gtk_label_new( _("Aspect Ratio:") );
++    gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
++    gtk_table_attach(GTK_TABLE(table), label, 0, 1, 3, 4,
++                              GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL, 2, 2);
++
++    img->aspect_ratio_combo = _gtk_combo_box_new_text(FALSE);
++    gtk_table_attach(GTK_TABLE(table), img->aspect_ratio_combo, 1, 2, 3, 4,
++                              GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL, 0, 2);
++
++    /* Bitrate */
++    label = gtk_label_new( _("Bitrate:") );
++    gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
++    gtk_table_attach(GTK_TABLE(table), label, 0, 1, 4, 5,
++                              GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL, 2, 2);
++
++    img->bitrate_combo = _gtk_combo_box_new_text(FALSE);
++    gtk_table_attach(GTK_TABLE(table), img->bitrate_combo, 1, 2, 4, 5,
++                              GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL, 0, 2);
+ 
+ 	/* Advanced Settings */
+ 
+@@ -286,375 +291,151 @@ img_update_current_slide( img_window_struct *img )
+ static void img_video_format_changed (GtkComboBox *combo, img_window_struct *img)
+ {
+ 	GtkTreeIter   iter;
+-	GtkListStore *store = GTK_LIST_STORE( gtk_combo_box_get_model(GTK_COMBO_BOX( img->video_size_combo ) ) );
+-
+-	gtk_list_store_clear(store);
+-	switch (gtk_combo_box_get_active(combo))
+-	{
+-		case 0:
+-			gtk_list_store_append( store, &iter );
+-			gtk_list_store_set( store, &iter, 0, "720 x 480 NTSC", -1 );
+-			gtk_list_store_append( store, &iter );
+-			gtk_list_store_set( store, &iter, 0, "720 x 576 PAL", -1 );
+-			gtk_list_store_append( store, &iter );
+-			gtk_list_store_set( store, &iter, 0, "1280 x 720 HD", -1 );
+-			gtk_list_store_append( store, &iter );
+-			gtk_list_store_set( store, &iter, 0, "1920 x 1080 HD", -1 );
+-		break;
+-
+-		case 1:
+-		case 2:
+-			gtk_list_store_append( store, &iter );
+-			gtk_list_store_set( store, &iter, 0, "320 x 240 4:3", -1 );
+-			gtk_list_store_append( store, &iter );
+-			gtk_list_store_set( store, &iter, 0, "400 x 300", -1 );
+-			gtk_list_store_append( store, &iter );
+-			gtk_list_store_set( store, &iter, 0, "512 x 384", -1 );
+-			gtk_list_store_append( store, &iter );
+-			gtk_list_store_set( store, &iter, 0, "640 x 480", -1 );
+-			gtk_list_store_append( store, &iter );
+-			gtk_list_store_set( store, &iter, 0, "800 x 600", -1 );
+-			gtk_list_store_append( store, &iter );
+-			gtk_list_store_set( store, &iter, 0, "320 x 180 16:9", -1 );
+-			gtk_list_store_append( store, &iter );
+-			gtk_list_store_set( store, &iter, 0, "400 x 225", -1 );
+-			gtk_list_store_append( store, &iter );
+-			gtk_list_store_set( store, &iter, 0, "512 x 288", -1 );
+-			gtk_list_store_append( store, &iter );
+-			gtk_list_store_set( store, &iter, 0, "640 x 360", -1 );
+-			gtk_list_store_append( store, &iter );
+-			gtk_list_store_set( store, &iter, 0, "854 x 480", -1 );
+-		break;
+-
+-		case 3:
+-			gtk_list_store_append( store, &iter );
+-			gtk_list_store_set( store, &iter, 0, "128 x 96", -1 );
+-			gtk_list_store_append( store, &iter );
+-			gtk_list_store_set( store, &iter, 0, "176 x 144", -1 );
+-			gtk_list_store_append( store, &iter );
+-			gtk_list_store_set( store, &iter, 0, "352 x 288", -1 );
+-			gtk_list_store_append( store, &iter );
+-			gtk_list_store_set( store, &iter, 0, "704 x 576", -1 );
+-			gtk_list_store_append( store, &iter );
+-			gtk_list_store_set( store, &iter, 0, "1408 x 1152", -1 );
+-		break;
+-
+-		case 4:
+-			gtk_list_store_append( store, &iter );
+-			gtk_list_store_set( store, &iter, 0, "480 x 360", -1 );
+-			gtk_list_store_append( store, &iter );
+-			gtk_list_store_set( store, &iter, 0, "1280 x 720", -1 );
+-			gtk_list_store_append( store, &iter );
+-			gtk_list_store_set( store, &iter, 0, "1920 x 1080", -1 );
+-		break;
++	GtkListStore *store;
++    gint          video_format, i;
++
++	video_format = gtk_combo_box_get_active(combo);
++
++    /* Video size */
++    store = GTK_LIST_STORE( gtk_combo_box_get_model(GTK_COMBO_BOX( img->video_size_combo ) ) );
++    gtk_list_store_clear(store);
++    i = 0;
++    while (video_format_list[video_format].sizelist[i].name != NULL) {
++        gtk_list_store_append (store, &iter );
++		gtk_list_store_set (store, &iter, 0,
++                            video_format_list[video_format].sizelist[i].name, -1 );
++        i++;
+ 	}
+-	gtk_combo_box_set_active(GTK_COMBO_BOX(img->video_size_combo),0);
++	/* Combo is set to default size at the end because it triggers img_video_size_changed */
++
++    /* Aspect Ratio */
++    if (video_format_list[video_format].aspect_ratio_list == NULL)
++    {
++        gtk_widget_set_sensitive(img->aspect_ratio_combo, FALSE);
++        gtk_combo_box_set_active(GTK_COMBO_BOX(img->aspect_ratio_combo), -1);
++    }
++    else
++    {
++        gtk_widget_set_sensitive(img->aspect_ratio_combo, TRUE);
++        store = GTK_LIST_STORE(gtk_combo_box_get_model(GTK_COMBO_BOX(img->aspect_ratio_combo)));
++        gtk_list_store_clear(store);
++        i = 0;
++        while (video_format_list[video_format].aspect_ratio_list[i].name != NULL) {
++            gtk_list_store_append( store, &iter );
++            gtk_list_store_set( store, &iter, 0,
++                          video_format_list[video_format].aspect_ratio_list[i].name, -1 );
++            i++;
++        }
++        gtk_combo_box_set_active(GTK_COMBO_BOX(img->aspect_ratio_combo), 0);
++    }
++
++    /* FPS */
++    store = GTK_LIST_STORE(gtk_combo_box_get_model(GTK_COMBO_BOX(img->fps_combo)));
++    gtk_list_store_clear(store);
++    i = 0;
++    while (video_format_list[video_format].fps_list[i].name != NULL) {
++        gtk_list_store_append( store, &iter );
++        gtk_list_store_set( store, &iter, 0, video_format_list[video_format].fps_list[i].name, -1 );
++        i++;
++    }
++    gtk_combo_box_set_active(GTK_COMBO_BOX(img->fps_combo),0);
++
++
++    /* Bitrate */
++    if (video_format_list[video_format].bitratelist == NULL)
++    {
++        gtk_widget_set_sensitive(img->bitrate_combo, FALSE);        gtk_combo_box_set_active(GTK_COMBO_BOX(img->bitrate_combo),-1);
++    }
++    else
++    {
++        gtk_widget_set_sensitive(img->bitrate_combo, TRUE);
++        store = GTK_LIST_STORE(gtk_combo_box_get_model(GTK_COMBO_BOX(img->bitrate_combo)));
++        gtk_list_store_clear(store);
++        i = 0;
++        while (video_format_list[video_format].bitratelist[i].name != NULL) {
++            gtk_list_store_append( store, &iter );
++            gtk_list_store_set( store, &iter, 0, gettext(video_format_list[video_format].bitratelist[i].name), -1 );
++            i++;
++        }
++        gtk_combo_box_set_active(GTK_COMBO_BOX(img->bitrate_combo),0);
++    }
++
++    /* This triggers img_video_size_changed and presets other combo boxes to default parameters */
++    gtk_combo_box_set_active(GTK_COMBO_BOX(img->video_size_combo), 0);
++}
++
++static void img_video_size_changed (GtkComboBox *combo, img_window_struct *img)
++{
++    gint size_idx, format_idx, index;
++
++    size_idx = gtk_combo_box_get_active(GTK_COMBO_BOX(img->video_size_combo));
++    if (size_idx == -1)
++        return;
++    format_idx = gtk_combo_box_get_active(GTK_COMBO_BOX(img->video_format_combo));
++
++    index = video_format_list[format_idx].sizelist[size_idx].default_fps_idx;
++    if (index != -1)
++        gtk_combo_box_set_active(GTK_COMBO_BOX(img->fps_combo), index);
++
++    index = video_format_list[format_idx].sizelist[size_idx].default_aspect_ratio_idx;
++    if (index != -1)
++        gtk_combo_box_set_active(GTK_COMBO_BOX(img->aspect_ratio_combo), index);
++
++    index = video_format_list[format_idx].sizelist[size_idx].default_bitrate_idx;
++    if (index != -1)
++        gtk_combo_box_set_active(GTK_COMBO_BOX(img->bitrate_combo), index);
+ }
+ 
+ void img_get_format_options(img_window_struct *img)
+ {
+-	switch (gtk_combo_box_get_active(GTK_COMBO_BOX(img->video_format_combo)) )
+-	{
+-		case 0: /* VOB */
+-			img->video_format = 'V';
+-			switch (gtk_combo_box_get_active(GTK_COMBO_BOX(img->video_size_combo)) )
+-			{
+-				case 0:
+-				img->video_size[0] = 720;
+-				img->video_size[1] = 480;
+-				break;
+-
+-				case 1:
+-				img->video_size[0] = 720;
+-				img->video_size[1] = 576;
+-				break;
+-
+-				case 2:
+-				img->video_size[0] = 1280;
+-				img->video_size[1] = 720;
+-				break;
+-
+-				case 3:
+-				img->video_size[0] = 1920;
+-				img->video_size[1] = 1080;
+-				break;
+-			}
+-		break;
+-		
+-		case 1: /* OGV */
+-		case 2: /* FLV */
+-			if (gtk_combo_box_get_active(GTK_COMBO_BOX(img->video_format_combo)) == 1)
+-				img->video_format = 'O';
+-			else if (gtk_combo_box_get_active(GTK_COMBO_BOX(img->video_format_combo)) == 2)
+-				img->video_format = 'F';
+-
+-			switch (gtk_combo_box_get_active(GTK_COMBO_BOX(img->video_size_combo)) )
+-			{
+-				case 0:
+-				img->video_size[0] = 320;
+-				img->video_size[1] = 240;
+-				break;
+-
+-				case 1:
+-				img->video_size[0] = 400;
+-				img->video_size[1] = 300;
+-				break;
+-
+-				case 2:
+-				img->video_size[0] = 512;
+-				img->video_size[1] = 384;
+-				break;
+-
+-				case 3:
+-				img->video_size[0] = 640;
+-				img->video_size[1] = 480;
+-				break;
+-				
+-				case 4:
+-				img->video_size[0] = 800;
+-				img->video_size[1] = 600;
+-				break;
+-
+-				case 5:
+-				img->video_size[0] = 320;
+-				img->video_size[1] = 180;
+-				break;
+-
+-				case 6:
+-				img->video_size[0] = 400;
+-				img->video_size[1] = 225;
+-				break;
+-
+-				case 7:
+-				img->video_size[0] = 512;
+-				img->video_size[1] = 288;
+-				break;
+-
+-				case 8:
+-				img->video_size[0] = 640;
+-				img->video_size[1] = 360;
+-				break;
+-
+-				case 9:
+-				img->video_size[0] = 854;
+-				img->video_size[1] = 480;
+-				break;
+-			}
+-		break;
+-
+-		case 3: /* 3GP */
+-			img->video_format = '3';
+-			switch (gtk_combo_box_get_active(GTK_COMBO_BOX(img->video_size_combo)) )
+-			{
+-				case 0:
+-				img->video_size[0] = 128;
+-				img->video_size[1] = 96;
+-				break;
+-
+-				case 1:
+-				img->video_size[0] = 176;
+-				img->video_size[1] = 144;
+-				break;
+-
+-				case 2:
+-				img->video_size[0] = 352;
+-				img->video_size[1] = 288;
+-				break;
+-
+-				case 3:
+-				img->video_size[0] = 704;
+-				img->video_size[1] = 576;
+-				break;
+-
+-				case 4:
+-				img->video_size[0] = 1408;
+-				img->video_size[1] = 1152;
+-				break;
+-			}
+-		break;
+-
+-		case 4: /* MP4 */
+-			img->video_format = 'M';
+-			switch (gtk_combo_box_get_active(GTK_COMBO_BOX(img->video_size_combo)) )
+-			{
+-				case 0:
+-				img->video_size[0] = 480;
+-				img->video_size[1] = 360;
+-				break;
+-
+-				case 1:
+-				img->video_size[0] = 1280;
+-				img->video_size[1] = 720;
+-				break;
+-
+-				case 2:
+-				img->video_size[0] = 1920;
+-				img->video_size[1] = 1080;
+-				break;
+-			}
+-		break;
+-	}
++    gint    video_format_index, video_size_index;
++
++    video_format_index = gtk_combo_box_get_active(GTK_COMBO_BOX(img->video_format_combo));
++    video_size_index = gtk_combo_box_get_active(GTK_COMBO_BOX(img->video_size_combo));
++
++    img->video_format_index = video_format_index;
++    img->video_size[0] = video_format_list[video_format_index].sizelist[video_size_index].x;
++    img->video_size[1] = video_format_list[video_format_index].sizelist[video_size_index].y;
++    img->aspect_ratio_index = gtk_combo_box_get_active(GTK_COMBO_BOX(img->aspect_ratio_combo));
++    img->bitrate_index = gtk_combo_box_get_active(GTK_COMBO_BOX(img->bitrate_combo));
++    img->fps_index = gtk_combo_box_get_active(GTK_COMBO_BOX(img->fps_combo));
++    img->export_fps = video_format_list[video_format_index].fps_list[img->fps_index].value;
+ }
+ 
+ void img_set_format_options(img_window_struct *img)
+ {
+-	switch (img->video_format)
+-	{
+-		case 'V':
+-			gtk_combo_box_set_active(GTK_COMBO_BOX(img->video_format_combo), 0);
+-			switch (img->video_size[1])
+-			{
+-				case 480:
+-				gtk_combo_box_set_active(GTK_COMBO_BOX(img->video_size_combo), 0);
+-				break;
+-
+-				case 576:
+-				gtk_combo_box_set_active(GTK_COMBO_BOX(img->video_size_combo), 1);
+-				break;
+-
+-				case 720:
+-				gtk_combo_box_set_active(GTK_COMBO_BOX(img->video_size_combo), 2);
+-				break;
+-
+-				case 1080:
+-				gtk_combo_box_set_active(GTK_COMBO_BOX(img->video_size_combo), 3);
+-				break;
+-			}
+-		break;
+-
+-		case 'O':
+-			gtk_combo_box_set_active(GTK_COMBO_BOX(img->video_format_combo), 1);
+-			switch (img->video_size[1])
+-			{
+-				case 240:
+-				gtk_combo_box_set_active(GTK_COMBO_BOX(img->video_size_combo), 0);
+-				break;
+-
+-				case 300:
+-				gtk_combo_box_set_active(GTK_COMBO_BOX(img->video_size_combo), 1);
+-				break;
+-
+-				case 384:
+-				gtk_combo_box_set_active(GTK_COMBO_BOX(img->video_size_combo), 2);
+-				break;
+-
+-				case 480:
+-				if (img->video_size[0] == 640)
+-					gtk_combo_box_set_active(GTK_COMBO_BOX(img->video_size_combo), 3);
+-				else
+-					gtk_combo_box_set_active(GTK_COMBO_BOX(img->video_size_combo), 9);
+-				break;
+-				
+-				case 600:
+-				gtk_combo_box_set_active(GTK_COMBO_BOX(img->video_size_combo), 4);
+-				break;
+-
+-				case 180:
+-				gtk_combo_box_set_active(GTK_COMBO_BOX(img->video_size_combo), 5);
+-				break;
+-
+-				case 225:
+-				gtk_combo_box_set_active(GTK_COMBO_BOX(img->video_size_combo), 6);
+-				break;
+-
+-				case 288:
+-				gtk_combo_box_set_active(GTK_COMBO_BOX(img->video_size_combo), 7);
+-				break;
+-
+-				case 360:
+-				gtk_combo_box_set_active(GTK_COMBO_BOX(img->video_size_combo), 8);
+-				break;
+-			}
+-		break;
+-
+-		case 'F':
+-			gtk_combo_box_set_active(GTK_COMBO_BOX(img->video_format_combo), 2);
+-			switch (img->video_size[1])
+-			{
+-				case 240:
+-				gtk_combo_box_set_active(GTK_COMBO_BOX(img->video_size_combo), 0);
+-				break;
+-
+-				case 300:
+-				gtk_combo_box_set_active(GTK_COMBO_BOX(img->video_size_combo), 1);
+-				break;
+-
+-				case 384:
+-				gtk_combo_box_set_active(GTK_COMBO_BOX(img->video_size_combo), 2);
+-				break;
+-
+-				case 480:
+-				if (img->video_size[0] == 640)
+-					gtk_combo_box_set_active(GTK_COMBO_BOX(img->video_size_combo), 3);
+-				else
+-					gtk_combo_box_set_active(GTK_COMBO_BOX(img->video_size_combo), 9);
+-				break;
+-				
+-				case 600:
+-				gtk_combo_box_set_active(GTK_COMBO_BOX(img->video_size_combo), 4);
+-				break;
+-
+-				case 180:
+-				gtk_combo_box_set_active(GTK_COMBO_BOX(img->video_size_combo), 5);
+-				break;
+-
+-				case 225:
+-				gtk_combo_box_set_active(GTK_COMBO_BOX(img->video_size_combo), 6);
+-				break;
+-
+-				case 288:
+-				gtk_combo_box_set_active(GTK_COMBO_BOX(img->video_size_combo), 7);
+-				break;
+-
+-				case 360:
+-				gtk_combo_box_set_active(GTK_COMBO_BOX(img->video_size_combo), 8);
+-				break;
+-			}
+-		break;
+-
+-		case '3':
+-			gtk_combo_box_set_active(GTK_COMBO_BOX(img->video_format_combo), 3);
+-			switch (img->video_size[1])
+-			{
+-				case 96:
+-				gtk_combo_box_set_active(GTK_COMBO_BOX(img->video_size_combo), 0);
+-				break;
+-
+-				case 144:
+-				gtk_combo_box_set_active(GTK_COMBO_BOX(img->video_size_combo), 1);
+-				break;
+-
+-				case 288:
+-				gtk_combo_box_set_active(GTK_COMBO_BOX(img->video_size_combo), 2);
+-				break;
+-
+-				case 576:
+-				gtk_combo_box_set_active(GTK_COMBO_BOX(img->video_size_combo), 3);
+-				break;
+-				
+-				case 1152:
+-				gtk_combo_box_set_active(GTK_COMBO_BOX(img->video_size_combo), 4);
+-				break;
+-			}
+-		break;
+-		
+-		case 'M':
+-			gtk_combo_box_set_active(GTK_COMBO_BOX(img->video_format_combo), 4);
+-			switch (img->video_size[1])
+-			{
+-				case 360:
+-				gtk_combo_box_set_active(GTK_COMBO_BOX(img->video_size_combo), 0);
+-				break;
+-
+-				case 720:
+-				gtk_combo_box_set_active(GTK_COMBO_BOX(img->video_size_combo), 1);
+-				break;
+-
+-				case 1080:
+-				gtk_combo_box_set_active(GTK_COMBO_BOX(img->video_size_combo), 2);
+-				break;
+-			}
+-		break;
+-	}
++    gint i;
++    struct video_size *size_list;
++
++    /* Video format */
++    gtk_combo_box_set_active(GTK_COMBO_BOX(img->video_format_combo), img->video_format_index);
++
++    /* size list */
++    size_list = video_format_list[img->video_format_index].sizelist;
++    i = 0;
++    while (size_list[i].name != NULL)
++    {
++        if (img->video_size[0] == size_list[i].x
++            && img->video_size[1] == size_list[i].y)
++        {
++            gtk_combo_box_set_active(GTK_COMBO_BOX(img->video_size_combo), i);
++            break;
++        }
++        i++;
++    }
++    if (size_list[i].name == NULL) {
++        img_message(img, FALSE, "No video size found\n"); /* FIXME - add a custom Size option */
++    }
++
++    /* Aspect Ratio */
++    if (video_format_list[img->video_format_index].aspect_ratio_list != NULL)
++        gtk_combo_box_set_active(GTK_COMBO_BOX(img->aspect_ratio_combo), img->aspect_ratio_index);
++
++    /* Bitrate */
++    if (video_format_list[img->video_format_index].bitratelist != NULL)
++        gtk_combo_box_set_active(GTK_COMBO_BOX(img->bitrate_combo), img->bitrate_index);
++    
++    /* FPS */
++    gtk_combo_box_set_active(GTK_COMBO_BOX(img->fps_combo), img->fps_index);
+ }
+ 
+diff --git a/src/new_slideshow.h b/src/new_slideshow.h
+index e313770..65546b1 100644
+--- a/src/new_slideshow.h
++++ b/src/new_slideshow.h
+@@ -1,6 +1,7 @@
+ /*
+  *  Copyright (c) 2009 Giuseppe Torelli <colossus73@gmail.com>
+  *  Copyright (c) 2009 Tadej Borovšak 	<tadeboro@gmail.com>
++ *  Copyright (c) 2011 Robert Chéramy   <robert@cheramy.net>
+  *
+  *  This program is free software; you can redistribute it and/or modify
+  *  it under the terms of the GNU General Public License as published by
+@@ -17,8 +18,8 @@
+  *  Foundation,Inc.,59 Temple Place - Suite 330,Boston,MA 02111-1307,USA.
+  *
+  */
+- 
+- #ifndef __NEW_SLIDESHOW_H__
++
++#ifndef __NEW_SLIDESHOW_H__
+ #define __NEW_SLIDESHOW_H__
+ 
+ #include <gtk/gtk.h>
+@@ -29,4 +30,5 @@
+ void img_new_slideshow_settings_dialog(img_window_struct *, gboolean);
+ void img_set_format_options (img_window_struct *);
+ void img_get_format_options (img_window_struct *);
++
+ #endif
+diff --git a/src/slideshow_project.c b/src/slideshow_project.c
+index 33e0a6c..6959c3d 100644
+--- a/src/slideshow_project.c
++++ b/src/slideshow_project.c
+@@ -1,7 +1,8 @@
+ /*
+  *  Copyright (C) 2009 Giuseppe Torelli <colossus73@gmail.com>
+  *  Copyright (c) 2009 Tadej Borovšak 	<tadeboro@gmail.com>
+- * 
++ *  Copyright (c) 2011 Robert Chéramy   <robert@cheramy.net>
++ *
+  *  This program is free software; you can redistribute it and/or modify
+  *  it under the terms of the GNU General Public License as published by
+  *  the Free Software Foundation; either version 2 of the License, or
+@@ -18,6 +19,7 @@
+  */
+ 
+ #include "slideshow_project.h"
++#include "video_formats.h"
+ 
+ static gboolean img_populate_hash_table( GtkTreeModel *, GtkTreePath *, GtkTreeIter *, GHashTable ** );
+ 
+@@ -42,8 +44,29 @@ img_save_slideshow( img_window_struct *img,
+ 	/* Slideshow settings */
+ 	g_key_file_set_comment(img_key_file, NULL, NULL, comment_string, NULL);
+ 
+-	g_key_file_set_integer( img_key_file, "slideshow settings",
+-							"video format", img->video_size[1] );
++    g_key_file_set_string(img_key_file, "slideshow settings",
++                          "video codec",
++                          video_format_list[img->video_format_index].config_name);
++
++                          g_key_file_set_integer(img_key_file, "slideshow settings",
++                          "video width", img->video_size[0]);
++    g_key_file_set_integer(img_key_file, "slideshow settings",
++                          "video height", img->video_size[1]);
++
++    g_key_file_set_string(img_key_file, "slideshow settings",
++                "fps",
++                video_format_list[img->video_format_index].fps_list[img->fps_index].name);
++
++    if (NULL != video_format_list[img->video_format_index].aspect_ratio_list)
++        g_key_file_set_string(img_key_file, "slideshow settings",
++                "aspect ratio",
++                video_format_list[img->video_format_index].aspect_ratio_list[img->aspect_ratio_index].name);
++
++    if (NULL != video_format_list[img->video_format_index].bitratelist)
++        g_key_file_set_integer(img_key_file, "slideshow settings",
++                "bitrate",
++                video_format_list[img->video_format_index].bitratelist[img->bitrate_index].value);
++
+ 	g_key_file_set_double_list( img_key_file, "slideshow settings",
+ 								"background color", img->background_color, 3 );
+ 	g_key_file_set_boolean(img_key_file,"slideshow settings", "distort images", img->distort_images);
+@@ -188,6 +211,8 @@ img_load_slideshow( img_window_struct *img,
+ 	gdouble    *color, *font_color, *font_bgcolor;
+ 	gboolean    old_file = FALSE;
+ 	gboolean    first_slide = TRUE;
++    gchar      *video_config_name, *aspect_ratio, *fps;
++    gint        old_video_size, bitrate;
+ 
+ 	/* Cretate new key file */
+ 	img_key_file = g_key_file_new();
+@@ -230,12 +255,125 @@ img_load_slideshow( img_window_struct *img,
+ 							&table );
+ 
+ 	/* Set the slideshow options */
+-	img->video_size[1] = g_key_file_get_integer( img_key_file,
+-												 "slideshow settings",
+-												 "video format", NULL);
+-	gtk_widget_set_size_request( img->image_area,
+-								 img->video_size[0] * img->image_area_zoom,
+-								 img->video_size[1] * img->image_area_zoom );
++    /* Video Format, first check if we have a buggy, old file format (imagination <= 3.0) */
++    old_video_size = g_key_file_get_integer(img_key_file, "slideshow settings", "video format", NULL);
++    if (old_video_size != 0)
++    {
++        img_message(img, FALSE, "Old imagination project file, guessing format as VOB\n");
++        img->video_format_index = 0; /* index for VOB format*/
++
++        for (i = 0;
++             video_format_list[0].sizelist[i].name != NULL
++             && video_format_list[0].sizelist[i].y != old_video_size;
++             i++);
++        if (video_format_list[0].sizelist[i].name != NULL)
++        {
++            img->video_size[0] = video_format_list[0].sizelist[i].x;
++            img->video_size[1] = old_video_size;
++        }
++        else /* we could not find the appropriate format, so we guess 4:3 format */
++        {
++            img->video_size[0] = old_video_size * 4 / 3;
++            img->video_size[1] = old_video_size;
++        }
++
++        /* Guess fps from video size */
++        if (img->video_size[1] == 576)
++            img->fps_index = 1; /* NTSC */
++        else
++            img->fps_index = 0; /* PAL */
++        img->export_fps = video_format_list[img->video_format_index].fps_list[img->fps_index].value;
++
++        /* set other parameters to defaults, as they can't be checked */
++        img->aspect_ratio_index = 0;    /* 4:3 */
++        img->bitrate_index = 0;         /* Not used in vob */
++
++    }
++    else
++    {
++        /* Video Codec */
++        video_config_name = g_key_file_get_string(img_key_file, "slideshow settings",
++                                "video codec", NULL);
++        i = 0;
++        while (video_config_name != NULL
++                && video_format_list[i].name != NULL
++                && strcmp (video_format_list[i].config_name, video_config_name) != 0)
++            i++;
++        if (video_config_name == NULL || video_format_list[i].name == NULL)
++        {
++            img_message(img, FALSE, "Could not find a video format, guessing VOB\n");
++            img->video_format_index = 0; /* index for VOB format*/
++        }
++        else
++            img->video_format_index = i;
++
++        /* Video Size */
++        img->video_size[0] = g_key_file_get_integer(img_key_file, "slideshow settings",
++                                "video width", NULL);
++        img->video_size[1] = g_key_file_get_integer(img_key_file, "slideshow settings",
++                                "video height", NULL);
++
++        /* fps */
++        fps = g_key_file_get_string(img_key_file, "slideshow settings", "fps", NULL);
++        i = 0;
++        while (fps != NULL
++                && strcmp (video_format_list[img->video_format_index].fps_list[i].name, fps) != 0)
++            i++;
++
++        if (fps == NULL
++            || video_format_list[img->video_format_index].fps_list[i].name == NULL)
++        {
++            img_message(img, FALSE, "Could not find a fps, set to default\n");
++            img->fps_index = 0; /* index for VOB format*/
++        }
++        else
++            img->fps_index = i;
++        img->export_fps = video_format_list[img->video_format_index].fps_list[img->fps_index].value;
++
++        /* Aspect ratio */
++        if (NULL != video_format_list[img->video_format_index].aspect_ratio_list)
++        {
++            aspect_ratio = g_key_file_get_string(img_key_file, "slideshow settings",
++                                    "aspect ratio", NULL);
++            i = 0;
++            while (aspect_ratio != NULL
++                   && video_format_list[img->video_format_index].aspect_ratio_list[i].name != NULL
++                   && strcmp (video_format_list[img->video_format_index].aspect_ratio_list[i].name, aspect_ratio) != 0)
++                i++;
++
++            if (aspect_ratio == NULL
++                || video_format_list[img->video_format_index].aspect_ratio_list[i].name == NULL)
++                {
++                    img_message(img, FALSE, "Could not find an aspect ratio, set to default\n");
++                    img->aspect_ratio_index = 0; /* index for VOB format*/
++                }
++                else
++                    img->aspect_ratio_index = i;
++        }
++        
++        /* Bitrate */
++        if (NULL != video_format_list[img->video_format_index].bitratelist)
++        {
++            bitrate = g_key_file_get_integer(img_key_file, "slideshow settings",
++                                    "bitrate", NULL);
++            i = 0;
++            while (video_format_list[img->video_format_index].bitratelist[i].name != NULL
++                   && video_format_list[img->video_format_index].bitratelist[i].value != bitrate)
++                i++;
++
++            if (video_format_list[img->video_format_index].bitratelist[i].name == NULL)
++                {
++                    img_message(img, FALSE, "Could not find a bitrate, set to default\n");
++                    img->bitrate_index = 0; /* index for VOB format*/
++                }
++                else
++                    img->bitrate_index = i;
++        }
++
++    }
++
++	img->video_ratio = (gdouble)img->video_size[0] / img->video_size[1];
++    img_zoom_fit(NULL, img);
+ 
+ 	/* Make loading more efficient by removing model from icon view */
+ 	g_object_ref( G_OBJECT( img->thumbnail_model ) );
+@@ -277,8 +415,11 @@ img_load_slideshow( img_window_struct *img,
+ 
+ 				/* Get the mem address of the transition */
+ 				spath = (gchar *)g_hash_table_lookup( table, GINT_TO_POINTER( transition_id ) );
+-				gtk_tree_model_get_iter_from_string( model, &iter, spath );
+-				gtk_tree_model_get( model, &iter, 2, &render, 0, &pix, -1 );
++				if (spath)
++				{
++					gtk_tree_model_get_iter_from_string( model, &iter, spath );
++					gtk_tree_model_get( model, &iter, 2, &render, 0, &pix, -1 );
++				}
+ 				slide_info = img_create_new_slide();
+ 				if( slide_info )
+ 				{
+@@ -380,6 +521,7 @@ img_load_slideshow( img_window_struct *img,
+ 			}
+ 			else
+ 			{
++				angle = 0;
+ 				/* We are loading an empty slide */
+ 				gradient = g_key_file_get_integer(img_key_file, conf, "gradient", NULL);
+ 				c_start = g_key_file_get_double_list(img_key_file, conf, "start_color", NULL, NULL);
+@@ -391,6 +533,8 @@ img_load_slideshow( img_window_struct *img,
+ 				load_ok = img_scale_gradient( gradient, p_start, p_stop,
+ 											  c_start, c_stop, 88, 72,
+ 											  &thumb, NULL );
++                /* No image is loaded, so img_load_ok is OK if load_ok is */
++                img_load_ok = load_ok;
+ 			}
+ 
+ 			/* Try to load image. If this fails, skip this slide */
+@@ -430,7 +574,7 @@ img_load_slideshow( img_window_struct *img,
+ 													 c_start, c_stop,
+ 													 p_start, p_stop );
+ 
+-                    /* Handle lod errors */
++                    /* Handle load errors */
+                     slide_info->load_ok = img_load_ok;
+                     slide_info->original_filename = original_filename;
+ 
+diff --git a/src/subtitles.c b/src/subtitles.c
+index 2dff6fb..917c5fd 100644
+--- a/src/subtitles.c
++++ b/src/subtitles.c
+@@ -124,6 +124,32 @@ img_text_grow( cairo_t     *cr,
+                gdouble     *font_color,
+                gdouble     *font_bgcolor);
+ 
++static void
++img_text_bottom_to_top( cairo_t     *cr,
++					PangoLayout *layout,
++ 					gint         sw,
++ 					gint         sh,
++ 					gint         lw,
++ 					gint         lh,
++ 					gint         posx,
++ 					gint         posy,
++ 					gdouble      progress,
++                    gdouble     *font_color,
++                    gdouble     *font_bgcolor);
++
++static void
++img_text_right_to_left( cairo_t     *cr,
++					PangoLayout *layout,
++ 					gint         sw,
++ 					gint         sh,
++ 					gint         lw,
++ 					gint         lh,
++ 					gint         posx,
++ 					gint         posy,
++ 					gdouble      progress,
++                    gdouble     *font_color,
++                    gdouble     *font_bgcolor);
++
+                
+ /* ****************************************************************************
+  * Function definitions
+@@ -148,7 +174,7 @@ gint
+ img_get_text_animation_list( TextAnimation **animations )
+ {
+ 	TextAnimation *list;              /* List of all animations */
+-	gint           no_animations = 7; /* Number of animations */
++	gint           no_animations = 9; /* Number of animations */
+ 	gint           i = 0;
+ 
+ 	if( animations )
+@@ -187,6 +213,14 @@ img_get_text_animation_list( TextAnimation **animations )
+ 		list[i].id     = i;
+ 		list[i++].func = img_text_grow;
+ 
++                list[i].name   = g_strdup( _("Slide bottom to top") );
++                list[i].id     = i;
++                list[i++].func = img_text_bottom_to_top;
++
++                list[i].name   = g_strdup( _("Slide right to left") );
++                list[i].id     = i;
++                list[i++].func = img_text_right_to_left;
++
+ 		/* FIXME: Add more animations here.
+ 		 *
+ 		 * DO NOT FORGET TO UPDATE no_animations VARIABLE AT THE TOP OF THIS
+@@ -538,3 +572,41 @@ img_text_grow( cairo_t     *cr,
+                          font_color, font_bgcolor);
+ }
+ 
++static void
++img_text_bottom_to_top( cairo_t     *cr,
++				   PangoLayout *layout,
++				   gint         sw,
++				   gint         sh,
++				   gint         lw,
++				   gint         lh,
++				   gint         posx,
++				   gint         posy,
++				   gdouble      progress,
++                   gdouble     *font_color,
++                   gdouble     *font_bgcolor)
++{
++    img_text_draw_layout(cr, layout,
++                         posx,
++                         sh * (1 - progress) - lh * progress,
++                         font_color, font_bgcolor);
++}
++
++static void
++img_text_right_to_left( cairo_t     *cr,
++				   PangoLayout *layout,
++				   gint         sw,
++				   gint         sh,
++				   gint         lw,
++				   gint         lh,
++				   gint         posx,
++				   gint         posy,
++				   gdouble      progress,
++                   gdouble     *font_color,
++                   gdouble     *font_bgcolor)
++{
++    img_text_draw_layout(cr, layout,
++                         sw * (1 - progress) - lw * progress,
++                         posy,
++                         font_color, font_bgcolor);
++}
++
+diff --git a/src/support.c b/src/support.c
+index 1a17d16..b6cef85 100644
+--- a/src/support.c
++++ b/src/support.c
+@@ -1,5 +1,6 @@
+ /*
+  *  Copyright (c) 2009 Giuseppe Torelli <colossus73@gmail.com>
++ *  Copyright (c) 2011 Robert Chéramy   <robert@cheramy.net>
+  *
+  *  This program is free software; you can redistribute it and/or modify
+  *  it under the terms of the GNU General Public License as published by
+@@ -18,6 +19,7 @@
+  */
+ 
+ #include "support.h"
++#include "video_formats.h"
+ #include <glib/gstdio.h>
+ 
+ static gboolean img_plugin_is_loaded(img_window_struct *, GModule *);
+@@ -318,6 +320,7 @@ void img_show_file_chooser(SexyIconEntry *entry, SexyIconEntryPosition icon_pos,
+ 	gint response;
+     GtkFileFilter *video_filter, *all_files_filter;
+     gchar *file_extention, *dot_position, *proposed_filename, *file_basename, *stripped_filename;
++    gint i;
+ 
+ 	file_selector = gtk_file_chooser_dialog_new (_("Please choose the slideshow project filename"),
+ 							GTK_WINDOW (img->imagination_window),
+@@ -330,39 +333,22 @@ void img_show_file_chooser(SexyIconEntry *entry, SexyIconEntryPosition icon_pos,
+ 
+     /* only video files filter */
+     video_filter = gtk_file_filter_new ();
+-    switch (img->video_format)
++
++    gtk_file_filter_set_name (video_filter,
++                video_format_list[img->video_format_index].name);
++
++    i = 0;
++    while (video_format_list[img->video_format_index].file_extensions[i] != NULL)
+     {
+-        default:
+-        case 'V':
+-        gtk_file_filter_set_name (video_filter, _("VOB (DVD video)") );
+-        gtk_file_filter_add_pattern (video_filter, "*.vob");
+-        file_extention = ".vob";
+-        break;
+-
+-        case 'M':
+-        gtk_file_filter_set_name (video_filter, _("MP4 (MPEG-4)") );
+-        gtk_file_filter_add_pattern (video_filter, "*.mp4");
+-        file_extention = ".mp4";
+-        break;
+-
+-        case 'O':
+-        gtk_file_filter_set_name (video_filter, _("OGV (Theora/Vorbis)") );
+-        gtk_file_filter_add_pattern (video_filter, "*.ogv");
+-        file_extention = ".ogv";
+-        break;
+-
+-        case 'F':
+-        gtk_file_filter_set_name (video_filter, _("FLV (Flash video)") );
+-        gtk_file_filter_add_pattern (video_filter, "*.flv");
+-        file_extention = ".flv";
+-        break;
+-
+-        case '3':
+-        gtk_file_filter_set_name (video_filter, _("3GP (Mobile Phones)") );
+-        gtk_file_filter_add_pattern (video_filter, "*.3gp");
+-        file_extention = ".3gp";
+-        break;
++        file_extention = g_strconcat("*",
++                video_format_list[img->video_format_index].file_extensions[i],
++                                     NULL);
++        gtk_file_filter_add_pattern (video_filter, file_extention);
++        g_free(file_extention);
++        i++;
+     }
++    file_extention = video_format_list[img->video_format_index].file_extensions[0];
++
+     gtk_file_chooser_add_filter (GTK_FILE_CHOOSER (file_selector), video_filter);
+ 
+     /* All files filter */
+@@ -1164,6 +1150,8 @@ img_message (img_window_struct *img,
+         gtk_text_buffer_insert(img->message_buffer, &message_end,
+                                parsed_message, -1);
+ 
++        printf (parsed_message);
++
+         free(parsed_message);
+ 
+         if (alert_user)
+@@ -1176,3 +1164,21 @@ img_message (img_window_struct *img,
+         }
+ 
+ }
++
++void
++img_check_for_encoder(img_window_struct *img)
++{
++	gchar *name = NULL;
++
++	name = g_find_program_in_path("ffmpeg");
++	if (name == NULL)
++	{
++		img_message(img, TRUE, "Using avconv for encoding.\n");
++		img->encoder_name = g_strdup("avconv");
++	}
++	else
++	{
++		img_message(img, TRUE, "Using ffmpeg for encoding.\n");
++		img->encoder_name = name;
++	} 
++}
+diff --git a/src/support.h b/src/support.h
+index 69ecfbe..9c9f1cd 100644
+--- a/src/support.h
++++ b/src/support.h
+@@ -1,5 +1,6 @@
+ /*
+  *  Copyright (c) 2009 Giuseppe Torelli <colossus73@gmail.com>
++ *  Copyright (c) 2011 Robert Chéramy   <robert@cheramy.net>
+  *
+  *  This program is free software; you can redistribute it and/or modify
+  *  it under the terms of the GNU General Public License as published by
+@@ -153,4 +154,7 @@ img_message (img_window_struct *img,
+              gboolean alert_user,
+              gchar *message, ...);
+ 
++void
++img_check_for_encoder(img_window_struct *img);
++
+ #endif
+diff --git a/src/video_formats.c b/src/video_formats.c
+new file mode 100644
+index 0000000..bb7c44a
+--- /dev/null
++++ b/src/video_formats.c
+@@ -0,0 +1,222 @@
++/*
++ *  Copyright (c) 2011 Robert Chéramy   <robert@cheramy.net>
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License,or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU Library General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not,write to the Free Software
++ *  Foundation,Inc.,59 Temple Place - Suite 330,Boston,MA 02111-1307,USA.
++ *
++ */
++
++/**** How to add a new video format ***
++Adding a new video format is quite easy: you have to add an entry to video_format_lists.
++This entry includes:
++gchar *name;                The name of the video format. As it will be
++                            displayed in the UI, wrap it with gettext_noop
++gchar *config_name;         The name to use to store it in the project file.
++gchar *ffmpeg_option;       The options (NOT Size/Aspect Ratio/Bitrate/FPS)
++                            you have to give ffmpeg to produce a video in this format.
++struct video_size *sizelist;                A list of Available video sizes for this
++                                            format (mandatory).
++struct aspect_ratio *aspect_ratio_list;     A list of Available aspect ratios for
++                                            this format or NULL if not needed.
++struct video_bitrate *bitratelist;          A list of Bitrates available for this
++                                            format or NULL if not needed.
++struct video_fps *fps_list;                 A list of Frames per second available
++                                            for this format (mandatory)
++gchar **file_extensions;                    A list of file extensions used by this format,
++                                            the first one is the default one.
++
++Lists must be defined separatly and end with the attribute name = NULL.
++
++Have fun !
++*/
++
++#include "video_formats.h"
++#include "support.h"
++/* As you cant use gettext in the video format declaration,
++    we use gettext_noop to mark them,
++    and explicitly call gettext when using the strings. */
++#define gettext_noop(string) string
++
++/* Define video formats */
++struct aspect_ratio aspect_ratio_list[] = {
++    {"4:3", "4/3"},
++    {"16:9", "16/9"},
++    {NULL}
++};
++
++struct video_size VOB_size_list[] = {
++    /* name, x, y, fps, ratio. bitrate, */
++    {"720 x 576 PAL",   720,  576,   0, -1, -1},
++    {"720 x 480 NTSC",  720,  480,   1, -1, -1},
++    {"1280 x 720 HD",  1280,  720,  -1, -1, -1},
++    {"1920 x 1080 HD", 1920, 1080,  -1, -1, -1},
++    {NULL}
++};
++
++struct video_fps VOB_fps_list[] = {
++    {"25 (PAL)", "25 -target pal-dvd", 25},
++    {"30 (NTSC)", "30000/1001 -target ntsc-dvd", 30000/1001},
++    {NULL}
++};
++
++gchar *VOB_extensions[] = {
++    ".vob",
++    ".mpg",
++    NULL
++};
++
++struct video_size OGV_size_list[] = {
++    {"320 x 240 4:3",   320, 240, -1,  0, 1},
++    {"400 x 300",       400, 300, -1, -1, 1},
++    {"512 x 384",       512, 384, -1, -1, 1},
++    {"640 x 480",       640, 480, -1, -1, 1},
++    {"800 x 600",       800, 600, -1, -1, 1},
++    {"320 x 180 16:9",  320, 180, -1,  1, 1},
++    {"400 x 225",       400, 225, -1, -1, 1},
++    {"512 x 288",       512, 288, -1, -1, 1},
++    {"640 x 360",       640, 360, -1, -1, 1},
++    {"854 x 480",       854, 480, -1, -1, 1},
++    {NULL}
++};
++
++/* These values have been contributed by Jean-Pierre Redonnet. */
++struct video_bitrate OGV_bitrate_list[] = {
++    {gettext_noop("512 kbps (low)"), 512*1024},
++    {gettext_noop("1024 kbps (medium)"), 1024*1024},
++    {gettext_noop("2048 kbps (high)"), 2048*1024},
++    {NULL}
++};
++
++struct video_fps OGV_fps_list[] = {
++    {"30", "30", 30},
++    {NULL}
++};
++
++gchar *OGV_extensions[] = {
++    ".ogv",
++    NULL
++};
++
++struct video_size FLV_size_list[] = {
++    {"320 x 240 4:3",   320, 240, -1,  0, 1},
++    {"400 x 300",       400, 300, -1, -1, 1},
++    {"512 x 384",       512, 384, -1, -1, 1},
++    {"640 x 480",       640, 480, -1, -1, 1},
++    {"800 x 600",       800, 600, -1, -1, 1},
++    {"320 x 180 16:9",  320, 180, -1,  1, 1},
++    {"400 x 225",       400, 225, -1, -1, 1},
++    {"512 x 288",       512, 288, -1, -1, 1},
++    {"640 x 360",       640, 360, -1, -1, 1},
++    {"854 x 480",       854, 480, -1, -1, 1},
++    {NULL}
++};
++
++struct video_bitrate FLV_bitrate_list[] = {
++    {gettext_noop("384 kbps (low)"), 384*1024},
++    {gettext_noop("768 kbps (medium)"), 768*1024},
++    {gettext_noop("1536 kbps (high)"), 1536*1024},
++    {NULL}
++};
++
++gchar *FLV_extensions[] = {
++    ".flv",
++    NULL
++};
++
++struct video_size x3GP_size_list[] = {
++    {"128 x 96",     128,   96, -1, -1, -1},
++    {"176 x 144",    176,  144, -1, -1, -1},
++    {"352 x 288",    352,  288, -1, -1, -1},
++    {"704 x 576",    704,  576, -1, -1, -1},
++    {"1408 x 1152", 1408, 1153, -1, -1, -1},
++    {NULL}
++};
++
++struct video_fps x3GP_fps_list[] = {
++    {"25", "25", 25},
++    {NULL}
++};
++
++gchar *x3GP_extensions[] = {
++    ".3gp",
++    NULL
++};
++
++/* x264 */
++struct video_size x264_size_list[] = {
++    {"HD 852x480",      852,    480, -1, -1, -1},
++    {"HD 1280x720",    1280,    720, -1, -1, -1},
++    {"HD 1440x1080",   1440,   1080, -1, -1, -1},
++    {"HD 1920x1080",   1920,   1080, -1, -1, -1},
++    {NULL}
++};
++
++struct video_fps x264_fps_list[] = {
++    {"25 (PAL)", "25", 25},
++    {"30 (NTSC)", "30000/1001", 30000/1001},
++    {NULL}
++};
++
++gchar *x264_extensions[] = {
++    ".mp4",
++    ".mkv",
++    NULL
++};
++
++struct video_format video_format_list[] = {
++    /* name, config_name, video_format, ffmpeg_option, sizelist,
++            aspect_ratio_list, bitratelist, fps_list, file_extensions */
++    {gettext_noop("VOB (DVD Video)"), "VOB",
++        "-loglevel debug "
++        "-bf 2 " /* use 2 B-Frames */
++        /* target is set with aspect ratio: pal-dvd or ntsc-dvd */
++        , VOB_size_list, aspect_ratio_list, NULL, VOB_fps_list,
++        VOB_extensions
++    },
++
++    {gettext_noop("OGV (Theora Vorbis)"), "OGV",
++        "-f ogg "
++        "-vcodec libtheora -acodec libvorbis"
++        , OGV_size_list, aspect_ratio_list, OGV_bitrate_list, OGV_fps_list,
++        OGV_extensions
++    },
++
++    {gettext_noop("FLV (Flash Video)"), "FLV",
++        "-f flv -vcodec flv -acodec libmp3lame"
++        "-ab 56000"     /* audio bitrate */
++        "-ar 22050"     /* audio sampling frequency*/
++        "-ac 1 "        /* number of audio channels */
++        , FLV_size_list, aspect_ratio_list, FLV_bitrate_list, OGV_fps_list,
++        FLV_extensions
++    },
++
++    {gettext_noop("3GP (Mobile Phones)"), "3GP",
++        "-f 3gp -vcodec h263 -acodec libfaac"
++        "-b 192k "                  /* bitrate */
++        "-ab 32k -ar 8000 -ac 1"    /* audio bitrate, sampling frequency and number of channels */
++        , x3GP_size_list, NULL, NULL, x3GP_fps_list,
++        x3GP_extensions
++    },
++    /* ffmpeg options for x264 thanks to David Gnedt */
++    {gettext_noop("H.264/MPEG-4 AVC"), "x264",
++        "-vcodec libx264 -crf 18 " /* FIXME -crf should be in a "Quality" option that also includes bitrate */
++        "-acodec libmp3lame -ac 2 -ar 44100 -b:a 128k",
++        x264_size_list,
++        aspect_ratio_list,
++        NULL,
++        x264_fps_list,
++        x264_extensions
++    },
++    {NULL}
++};
+diff --git a/src/video_formats.h b/src/video_formats.h
+new file mode 100644
+index 0000000..47942c4
+--- /dev/null
++++ b/src/video_formats.h
+@@ -0,0 +1,61 @@
++/*
++ *  Copyright (c) 2011 Robert Chéramy   <robert@cheramy.net>
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License,or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU Library General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not,write to the Free Software
++ *  Foundation,Inc.,59 Temple Place - Suite 330,Boston,MA 02111-1307,USA.
++ *
++ */
++
++#ifndef __VIDEO_FORMAT_H__
++#define __VIDEO_FORMAT_H__
++
++#include <gtk/gtk.h>
++
++struct video_size {
++    gchar  *name;
++    gint    x;
++    gint    y;
++    gint    default_fps_idx, default_aspect_ratio_idx, default_bitrate_idx;
++};
++
++struct video_bitrate {
++    gchar  *name;
++    gint    value;
++};
++
++struct aspect_ratio {
++    gchar   *name;
++    gchar   *ffmpeg_option;
++};
++
++struct video_fps {
++    gchar   *name;
++    gchar   *ffmpeg_option;
++    gdouble value;
++};
++
++struct video_format {
++    gchar *name;
++    gchar *config_name;
++    gchar *ffmpeg_option;
++    struct video_size *sizelist;
++    struct aspect_ratio *aspect_ratio_list;
++    struct video_bitrate *bitratelist;
++    struct video_fps *fps_list;
++    gchar **file_extensions;
++};
++
++extern struct video_format video_format_list[];
++
++#endif

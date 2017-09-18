@@ -1,6 +1,6 @@
 Name:           imagination          
 Version:        3.0
-Release:        15%{?dist}
+Release:        16%{?dist}
 Summary:        A lightweight and simple GTK based DVD slide show creator
 
 Group:          Applications/Multimedia
@@ -14,6 +14,10 @@ Patch2:         imagination-3.0-icon_fix.patch
 # Fixed in upstream trunk
 # http://imagination.svn.sourceforge.net/viewvc/imagination/trunk/configure.in?view=patch&r1=599&r2=598&pathrev=599
 Patch3:         imagination-3.0-configure.in.patch
+# from https://github.com/svn2github/imagination
+Patch4:         imagination-3.0_diferences_from_svn.diff
+Patch5:         0d99780e2e523e157ef6a70c0a8f068d6a41b67e...master.diff
+Patch6:         imagination-3.0-format-security.patch
 
 BuildRequires:  gtk2-devel
 BuildRequires:  sox-devel
@@ -36,16 +40,18 @@ language and built with the GTK+2 toolkit.
 
 %prep
 %setup -q
-autoreconf -fiv
+%patch4 -p1 -b .sync
+%patch5 -p1 -b .master
 %patch0 -b .plugins
 %patch1 -b .docfix
 %patch2 -p1 -b .iconfix
 %patch3 -p1 -b .conffix
+%patch6 -p1 -b .conffix
+mv configure.in configure.ac
 
 
 %build
-# Necessary due to patched configure.in
-/bin/bash ./autogen.sh
+autoreconf -fiv
 LDFLAGS=`pkg-config --libs gmodule-2.0`; export LDFLAGS
 %configure
 make %{?_smp_mflags} V=1
@@ -90,6 +96,9 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 %{_libdir}/%{name}
 
 %changelog
+* Sat Sep 16 2017 Sérgio Basto <sergio@serjux.com> - 3.0-16
+- Update to lastest source code
+
 * Thu Aug 31 2017 RPM Fusion Release Engineering <kwizart@rpmfusion.org> - 3.0-15
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Mass_Rebuild
 
