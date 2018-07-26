@@ -1,6 +1,6 @@
 Name:           imagination          
 Version:        3.0
-Release:        16%{?dist}
+Release:        17%{?dist}
 Summary:        A lightweight and simple GTK based DVD slide show creator
 
 Group:          Applications/Multimedia
@@ -90,6 +90,9 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 %{_libdir}/%{name}
 
 %changelog
+* Thu Jul 26 2018 RPM Fusion Release Engineering <leigh123linux@gmail.com> - 3.0-17
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_29_Mass_Rebuild
+
 * Thu Mar 01 2018 RPM Fusion Release Engineering <leigh123linux@googlemail.com> - 3.0-16
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
 
