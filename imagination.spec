@@ -1,19 +1,16 @@
 Name:           imagination          
-Version:        3.0
-Release:        17%{?dist}
+Version:        3.1
+Release:        1%{?dist}
 Summary:        A lightweight and simple GTK based DVD slide show creator
 
 Group:          Applications/Multimedia
 License:        GPLv2
 URL:            http://imagination.sourceforge.net/
-Source0:        http://downloads.sourceforge.net/project/imagination/imagination/%{version}/%{name}-%{version}.tar.gz
-Patch0:         imagination-3.0-plugins.patch
-Patch1:         imagination-3.0-docfix.patch
+Source0:        https://downloads.sourceforge.net/imagination/%{name}-%{version}.tar.bz2
+
+Patch0:         imagination-3.0-docfix.patch
 # Fix icon references to not require gnome-icon-theme-legacy
-Patch2:         imagination-3.0-icon_fix.patch
-# Fixed in upstream trunk
-# http://imagination.svn.sourceforge.net/viewvc/imagination/trunk/configure.in?view=patch&r1=599&r2=598&pathrev=599
-Patch3:         imagination-3.0-configure.in.patch
+Patch1:         imagination-3.0-icon_fix.patch
 
 BuildRequires:  gtk2-devel
 BuildRequires:  sox-devel
@@ -37,10 +34,8 @@ language and built with the GTK+2 toolkit.
 %prep
 %setup -q
 autoreconf -fiv
-%patch0 -b .plugins
-%patch1 -b .docfix
-%patch2 -p1 -b .iconfix
-%patch3 -p1 -b .conffix
+%patch0 -b .docfix
+%patch1 -p1 -b .iconfix
 
 
 %build
@@ -66,19 +61,6 @@ rm %{buildroot}%{_libdir}/%{name}/*.la
 desktop-file-validate %{buildroot}/%{_datadir}/applications/imagination.desktop
 
 
-%post
-touch --no-create %{_datadir}/icons/hicolor &>/dev/null || :
-
-%postun
-if [ $1 -eq 0 ] ; then
-    touch --no-create %{_datadir}/icons/hicolor &>/dev/null
-    gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
-fi
-
-%posttrans
-gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
-
-
 %files -f %{name}.lang
 %license COPYING
 %doc AUTHORS README _tmpdoc/*
@@ -90,6 +72,9 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 %{_libdir}/%{name}
 
 %changelog
+* Mon Oct 15 2018 Richard Shaw <hobbes1069@gmail.com> - 3.1-1
+- Update to 3.1.
+
 * Thu Jul 26 2018 RPM Fusion Release Engineering <leigh123linux@gmail.com> - 3.0-17
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_29_Mass_Rebuild
 
