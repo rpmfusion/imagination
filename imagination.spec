@@ -1,18 +1,18 @@
 Name:           imagination          
-Version:        3.1
-Release:        4%{?dist}
+Version:        3.5.1
+Release:        1%{?dist}
 Summary:        A lightweight and simple GTK based DVD slide show creator
 
 Group:          Applications/Multimedia
 License:        GPLv2
 URL:            http://imagination.sourceforge.net/
-Source0:        https://downloads.sourceforge.net/imagination/%{name}-%{version}.tar.bz2
+Source0:        https://downloads.sourceforge.net/imagination/%{name}-%{version}.tar.gz
 
 Patch0:         imagination-3.0-docfix.patch
 # Fix icon references to not require gnome-icon-theme-legacy
 Patch1:         imagination-3.0-icon_fix.patch
 
-BuildRequires:  gtk2-devel
+BuildRequires:  gtk3-devel
 BuildRequires:  sox-devel
 BuildRequires:  ffmpeg-devel
 BuildRequires:  libxslt docbook-style-xsl
@@ -33,17 +33,16 @@ language and built with the GTK+2 toolkit.
 
 %prep
 %setup -q
-autoreconf -fiv
 %patch0 -b .docfix
 %patch1 -p1 -b .iconfix
 
 
 %build
 # Necessary due to patched configure.in
-/bin/bash ./autogen.sh
+./autogen.sh
 LDFLAGS=`pkg-config --libs gmodule-2.0`; export LDFLAGS
 %configure
-make %{?_smp_mflags} V=1
+%make_build
 
 
 %install
@@ -72,6 +71,9 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/imagination.desktop
 %{_libdir}/%{name}
 
 %changelog
+* Wed May 27 2020 Sergio - 3.5.1-1
+- Update imagination to 3.5.1
+
 * Tue Feb 04 2020 RPM Fusion Release Engineering <leigh123linux@gmail.com> - 3.1-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
 

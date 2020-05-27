@@ -1,6 +1,6 @@
---- src/main-window.c.orig	2011-04-16 16:34:10.826673407 -0500
-+++ src/main-window.c	2011-04-16 16:35:18.218400982 -0500
-@@ -2127,7 +2127,7 @@
+--- src/main-window.c.orig	2020-05-27 05:14:24.148951173 +0100
++++ src/main-window.c	2020-05-27 05:28:14.376197928 +0100
+@@ -2257,7 +2257,7 @@ static void img_show_uri(GtkMenuItem * U
  	gchar *lang = NULL;
  	
  	lang = g_strndup(g_getenv("LANG"),2);
@@ -9,12 +9,12 @@
  	g_free(lang);
  	img_message (img, FALSE, "%s\n", file);
  
-@@ -2135,7 +2135,7 @@
- 	if ( !gtk_show_uri(NULL,file, GDK_CURRENT_TIME, NULL))
+@@ -2265,7 +2265,7 @@ static void img_show_uri(GtkMenuItem * U
+ 	if ( !gtk_show_uri_on_window(GTK_WINDOW(img->imagination_window), file, GDK_CURRENT_TIME, NULL))
  	{
  		g_free( file );
 -		file = g_strconcat("file://",DATADIR,"/doc/",PACKAGE,"/html/en/index.html",NULL);
 +		file = g_strconcat("file://",DATADIR,"/doc/",PACKAGE,"-",PACKAGE_VERSION,"/html/en/index.html",NULL);
- 		gtk_show_uri(NULL,file, GDK_CURRENT_TIME, NULL);
+ 		gtk_show_uri_on_window(GTK_WINDOW(img->imagination_window), file, GDK_CURRENT_TIME, NULL);
  	}
  	g_free(file);
