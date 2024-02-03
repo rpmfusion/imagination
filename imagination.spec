@@ -1,6 +1,6 @@
 Name:           imagination          
 Version:        3.6
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        A lightweight and simple GTK based DVD slide show creator
 
 Group:          Applications/Multimedia
@@ -71,6 +71,9 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/imagination.desktop
 %{_libdir}/%{name}
 
 %changelog
+* Sat Feb 03 2024 RPM Fusion Release Engineering <sergiomb@rpmfusion.org> - 3.6-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
 * Wed Aug 02 2023 RPM Fusion Release Engineering <sergiomb@rpmfusion.org> - 3.6-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
 
