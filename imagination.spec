@@ -33,8 +33,8 @@ language and built with the GTK+2 toolkit.
 
 %prep
 %setup -q
-%patch0 -b .docfix
-%patch1 -p1 -b .iconfix
+%patch -P0 -b .docfix
+%patch -P1 -p1 -b .iconfix
 
 
 %build
